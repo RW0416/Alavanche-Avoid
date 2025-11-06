@@ -1,0 +1,44 @@
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Mm]emoryCaptures/
+Obj/
+
+# OS / IDE
+.DS_Store
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Unity cache
+/[Uu]ser[Ss]ettings/
+*.pidb
+*.mdb
+
+# Crash/Profiler
+*.stacktrace
+
+# Addressables / ShaderCache (可选)
+[Aa]ddressable*/**/Android/**
+[Aa]ddressable*/**/iOS/**
+[Aa]ddressable*/**/Standalone*/**
+/[Aa]rtifactDB/
+
+# Plastic/Collab（若不用）
+/[Pp]lastic/
+/[Cc]ollab/
+
+# Builds & Archives
+*.apk
+*.aab
+*.ipa
+*.zip
+*.unitypackage
+
+# Rider / JetBrains
+.idea/
+*.iml
