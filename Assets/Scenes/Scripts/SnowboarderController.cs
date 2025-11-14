@@ -4,28 +4,25 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class SnowboarderController : MonoBehaviour
 {
+    private enum TrickType { None, BarrelRoll, FrontFlip, BackFlip }
+
     [Header("References")]
     public Transform visualRoot;
     public LayerMask groundMask = ~0;
 
     [Header("Ground Movement")]
-    [Tooltip("Extra push when holding W (on top of gravity).")]
     public float pushAcceleration = 12f;
     public float maxSpeed = 30f;
 
-    [Tooltip("Base friction while sliding (per second).")]
     public float baseGroundFriction = 0.6f;
-    [Tooltip("Extra friction while carving with A/D.")]
     public float carveExtraFriction = 0.4f;
-    [Tooltip("Extra friction while holding S.")]
     public float brakeExtraFriction = 2f;
-    [Tooltip("How strongly S kills your speed, in m/s per second.")]
     public float brakeStrength = 18f;
 
     [Header("Turning / Carving")]
-    public float turnSpeed = 90f;          // degrees per second
+    public float turnSpeed = 90f;          // degrees / second
     public float carveAcceleration = 6f;   // small lateral force
-    public float bodyAlignLerp = 10f;      // how fast body lines up with movement
+    public float bodyAlignLerp = 10f;
 
     [Header("Jump")]
     public float jumpForce = 6f;
@@ -34,6 +31,9 @@ public class SnowboarderController : MonoBehaviour
     [Header("Visual Lean")]
     public float maxLeanAngle = 25f;
     public float leanLerp = 12f;
+
+    [Header("Tricks")]
+    public float trickDuration = 0.8f;     // seconds for a full 360
 
     Rigidbody rb;
 
@@ -45,12 +45,17 @@ public class SnowboarderController : MonoBehaviour
     bool isGrounded;
     Vector3 groundNormal = Vector3.up;
 
+    // trick state
+    TrickType currentTrick = TrickType.None;
+    float trickTimer;
+    Vector3 trickAxisLocal = Vector3.up;
+
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
-        // allow yaw, but prevent tipping over
+        // allow yaw but stop tipping over
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
     }
 
@@ -63,16 +68,40 @@ public class SnowboarderController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (context.started)
+        if (!context.started)
+            return;
+
+        if (isGrounded)
+        {
+            // normal jump from ground
             jumpQueued = true;
+        }
+        else
+        {
+            // in air: space triggers a sideways flip
+            StartTrick(TrickType.BarrelRoll);
+        }
     }
 
-    // --------------- UPDATE LOOPS ----------------
+    // ---------------- UPDATE LOOPS ----------------
 
     void Update()
     {
         horizontalInput = moveInput.x;
         verticalInput   = moveInput.y;
+
+        // in the air: W = front flip, S = back flip
+        if (!isGrounded && currentTrick == TrickType.None)
+        {
+            if (verticalInput > 0.5f)
+            {
+                StartTrick(TrickType.FrontFlip);
+            }
+            else if (verticalInput < -0.5f)
+            {
+                StartTrick(TrickType.BackFlip);
+            }
+        }
 
         UpdateVisualRotation();
     }
@@ -90,7 +119,7 @@ public class SnowboarderController : MonoBehaviour
         ClampMaxSpeed();
     }
 
-    // --------------- GROUND CHECK ----------------
+    // ---------------- GROUND CHECK ----------------
 
     void UpdateGroundInfo()
     {
@@ -111,18 +140,17 @@ public class SnowboarderController : MonoBehaviour
         }
     }
 
-    // --------------- MOVEMENT (GROUND ONLY) ----------------
+    // ---------------- MOVEMENT (GROUND ONLY) ----------------
 
     void ApplyGroundMovement()
     {
         Vector3 vel = rb.linearVelocity;
 
-        // split velocity into along-ground and into-ground
         float vNormal = Vector3.Dot(vel, groundNormal);
         Vector3 normalVel = groundNormal * vNormal;
         Vector3 horizontalVel = vel - normalVel;
 
-        // if we're actually sliding, face the movement direction
+        // face movement direction if sliding
         if (horizontalVel.sqrMagnitude > 0.01f)
         {
             Vector3 moveDir = horizontalVel.normalized;
@@ -134,25 +162,24 @@ public class SnowboarderController : MonoBehaviour
             );
         }
 
-        // downhill from GLOBAL gravity, only for tuning / push direction
+        // downhill from global gravity, just for orientation / push
         Vector3 downhill = Vector3.ProjectOnPlane(Physics.gravity, groundNormal);
         if (downhill.sqrMagnitude > 0.001f)
             downhill.Normalize();
 
-        // --- friction ---
-
+        // base friction
         float friction = baseGroundFriction;
 
         if (Mathf.Abs(horizontalInput) > 0.01f)
-            friction += carveExtraFriction;    // carving slows you a bit
+            friction += carveExtraFriction;    // carving slows a bit
 
         if (verticalInput < 0f)
-            friction += brakeExtraFriction;    // pressing S slows harder
+            friction += brakeExtraFriction;    // holding S slows harder
 
-        // apply friction only to horizontal component
+        // friction only affects horizontal sliding
         horizontalVel -= horizontalVel * (friction * Time.fixedDeltaTime);
 
-        // extra brutal braking so S can bring you to a stop
+        // strong brake so S can actually stop you
         if (verticalInput < 0f && horizontalVel.sqrMagnitude > 0.0001f)
         {
             float speed = horizontalVel.magnitude;
@@ -160,32 +187,27 @@ public class SnowboarderController : MonoBehaviour
             horizontalVel = horizontalVel.normalized * newSpeed;
         }
 
-        // --- pushing with W (small boost) ---
-        if (verticalInput > 0f && downhill.sqrMagnitude > 0f)
+        // small manual push with W in direction of board forward
+        if (verticalInput > 0f)
         {
-            // push in board's forward direction projected on the ground
             Vector3 pushDir = Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
             rb.AddForce(pushDir * pushAcceleration, ForceMode.Acceleration);
         }
 
-        // --- carving left/right ---
-
+        // carving left/right
         if (Mathf.Abs(horizontalInput) > 0.01f && horizontalVel.sqrMagnitude > 0.01f)
         {
-            // rotate around world up (track is sloped but still basically vertical Y)
             float turnAmount = horizontalInput * turnSpeed * Time.fixedDeltaTime;
             transform.Rotate(Vector3.up, turnAmount, Space.World);
 
-            // slight lateral force so you can drift across the slope
             Vector3 sideDir = Vector3.Cross(groundNormal, transform.forward).normalized;
             rb.AddForce(sideDir * (horizontalInput * carveAcceleration), ForceMode.Acceleration);
         }
 
-        // reapply normal component so we don't mess with gravity
         rb.linearVelocity = horizontalVel + normalVel;
     }
 
-    // --------------- JUMP ----------------
+    // ---------------- JUMP ----------------
 
     void HandleJump()
     {
@@ -204,7 +226,7 @@ public class SnowboarderController : MonoBehaviour
         rb.AddForce(groundNormal * jumpForce, ForceMode.VelocityChange);
     }
 
-    // --------------- LIMIT SPEED ----------------
+    // ---------------- SPEED LIMIT ----------------
 
     void ClampMaxSpeed()
     {
@@ -216,26 +238,73 @@ public class SnowboarderController : MonoBehaviour
         }
     }
 
-    // --------------- VISUAL LEAN ----------------
+    // ---------------- TRICKS ----------------
+
+    void StartTrick(TrickType type)
+    {
+        if (currentTrick != TrickType.None)
+            return; // no stacking tricks
+
+        currentTrick = type;
+        trickTimer = 0f;
+
+        // local axes: X = side, Y = up, Z = forward
+        switch (type)
+        {
+            case TrickType.BarrelRoll:   // space in air
+                trickAxisLocal = Vector3.forward;   // roll around forward axis
+                break;
+            case TrickType.FrontFlip:    // W in air
+                trickAxisLocal = Vector3.right;     // forward flip
+                break;
+            case TrickType.BackFlip:     // S in air
+                trickAxisLocal = -Vector3.right;    // backward flip
+                break;
+        }
+    }
 
     void UpdateVisualRotation()
     {
         if (!visualRoot) return;
 
-        // no lean in air
-        float targetLean = isGrounded ? -horizontalInput * maxLeanAngle : 0f;
-        Quaternion leanRot = Quaternion.AngleAxis(targetLean, Vector3.forward);
-
-        // look along the board's forward projected onto the ground
+        // base orientation: board forward projected onto ground
         Vector3 lookDir = Vector3.ProjectOnPlane(transform.forward, groundNormal);
         if (lookDir.sqrMagnitude < 0.001f)
             lookDir = transform.forward;
 
         Quaternion baseRot = Quaternion.LookRotation(lookDir.normalized, groundNormal);
 
+        // no lean during tricks
+        float targetLean = (isGrounded && currentTrick == TrickType.None)
+            ? -horizontalInput * maxLeanAngle
+            : 0f;
+
+        Quaternion leanRot = Quaternion.AngleAxis(targetLean, Vector3.forward);
+
+        // trick rotation
+        Quaternion trickRot = Quaternion.identity;
+        if (currentTrick != TrickType.None)
+        {
+            trickTimer += Time.deltaTime;
+            float t = Mathf.Clamp01(trickTimer / trickDuration);
+            float angle = 360f * t;
+
+            // axis in world space based on board orientation
+            Vector3 axisWorld = baseRot * trickAxisLocal;
+            trickRot = Quaternion.AngleAxis(angle, axisWorld);
+
+            if (t >= 1f)
+            {
+                currentTrick = TrickType.None;
+            }
+        }
+
+        Quaternion targetRot = baseRot * leanRot * trickRot;
+
+        // smooth a bit
         visualRoot.rotation = Quaternion.Slerp(
             visualRoot.rotation,
-            baseRot * leanRot,
+            targetRot,
             leanLerp * Time.deltaTime
         );
     }

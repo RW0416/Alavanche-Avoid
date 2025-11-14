@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 49955088924448349}
   - component: {fileID: -4300437247712993182}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_Segmant_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -71,7 +71,7 @@ GameObject:
   - component: {fileID: 1413253861299151252}
   - component: {fileID: 3313924312120755301}
   - component: {fileID: 7494639446352372107}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
