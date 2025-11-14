@@ -2,34 +2,30 @@ using UnityEngine;
 
 public class FollowBall : MonoBehaviour
 {
-    [Header("¸úËæÄ¿±ê£¨ÍÏÄãµÄÇò½øÀ´£©")]
+    [Header("ï¿½ï¿½ï¿½ï¿½Ä¿ï¿½ê£¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½")]
     public Transform target;
 
-    [Header("Ïà»úÏà¶ÔÇòµÄÎ»ÖÃÆ«ÒÆ")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Æ«ï¿½ï¿½")]
     public Vector3 offset = new Vector3(0f, 5f, 10f);
-    // ½âÊÍ£ºY=5 ±íÊ¾ÔÚÇòÉÏ·½ 5 Ã×£¬Z=10 ±íÊ¾ÔÚÇò¡°ºóÃæ¡±Ò»µã
 
-    [Header("¸úËæÆ½»¬ËÙ¶È")]
+    [Header("ï¿½ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½Ù¶ï¿½")]
     public float followSpeed = 5f;
 
-    [Header("×ªÏòÆ½»¬ËÙ¶È")]
+    [Header("×ªï¿½ï¿½Æ½ï¿½ï¿½ï¿½Ù¶ï¿½")]
     public float lookSpeed = 10f;
 
     void LateUpdate()
     {
         if (!target) return;
 
-        // 1. ¼ÆËãÀíÏëÏà»úÎ»ÖÃ£ºÇòµÄÎ»ÖÃ + Æ«ÒÆ
         Vector3 desiredPos = target.position + offset;
 
-        // 2. Æ½»¬ÒÆ¶¯µ½Õâ¸öÎ»ÖÃ
         transform.position = Vector3.Lerp(
             transform.position,
             desiredPos,
             followSpeed * Time.deltaTime
         );
 
-        // 3. ÈÃÏà»úÊ¼ÖÕ¿´ÏòÇò£¨³¯ÏòÆ½»¬²åÖµ£©
         Vector3 lookDir = target.position - transform.position;
         if (lookDir.sqrMagnitude > 0.001f)
         {
