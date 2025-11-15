@@ -530,6 +530,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1341620292782584, guid: 40290f336ccbb6644ac5ebf86b4522fe, type: 3}
       insertIndex: -1
       addedObject: {fileID: 850068204}
+    - targetCorrespondingSourceObject: {fileID: 1341620292782584, guid: 40290f336ccbb6644ac5ebf86b4522fe, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 850068209}
   m_SourcePrefab: {fileID: 100100000, guid: 40290f336ccbb6644ac5ebf86b4522fe, type: 3}
 --- !u!1 &850068202 stripped
 GameObject:
@@ -603,12 +606,36 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 850068209}
+        m_TargetAssemblyTypeName: SnowboarderTricks, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 1dff4c39-fa67-47fb-b168-da2f87317eea
     m_ActionName: 'Gameplay/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 850068206}
         m_TargetAssemblyTypeName: SnowboarderController, Assembly-CSharp
+        m_MethodName: OnJump
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 850068209}
+        m_TargetAssemblyTypeName: SnowboarderTricks, Assembly-CSharp
         m_MethodName: OnJump
         m_Mode: 0
         m_Arguments:
@@ -641,8 +668,10 @@ MonoBehaviour:
   visualRoot: {fileID: 146940716}
   groundMask:
     serializedVersion: 2
-    m_Bits: 4294967295
-  pushAcceleration: 20
+    m_Bits: 8
+  slopeGravity: 25
+  stickToGroundGravity: 40
+  pushAcceleration: 12
   maxSpeed: 70
   baseGroundFriction: 0.6
   carveExtraFriction: 0.4
@@ -651,10 +680,8 @@ MonoBehaviour:
   turnSpeed: 90
   carveAcceleration: 6
   bodyAlignLerp: 10
-  jumpForce: 1
+  jumpForce: 4
   groundCheckDistance: 0.4
-  maxLeanAngle: 25
-  leanLerp: 10
 --- !u!54 &850068207
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -682,6 +709,22 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &850068209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850068202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d7ecd779ff689a42885703a7d05203c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnowboarderTricks
+  controller: {fileID: 0}
+  maxLeanAngle: 25
+  leanLerp: 10
+  trickDuration: 0.8
 --- !u!1001 &1414243461
 PrefabInstance:
   m_ObjectHideFlags: 0
