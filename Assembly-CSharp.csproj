@@ -48,24 +48,24 @@
     <Analyzer Include="E:\6000.2.8f1-x86_64\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
-    <Compile Include="Assets\Scenes\Scripts\Track_Slope_Control.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualJoystick.cs" />
-    <Compile Include="Assets\Scenes\Scripts\Garage Scripts\WorldPrompt.cs" />
-    <Compile Include="Assets\Scenes\Scripts\SnowDeformer.cs" />
-    <Compile Include="Assets\Scenes\Scripts\SnowboarderTricks.cs" />
-    <Compile Include="Assets\Scenes\Scripts\FloatingText.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
-    <Compile Include="Assets\Scenes\Scripts\SnowboarderController.cs" />
-    <Compile Include="Assets\Scenes\Scripts\ScoreManager.cs" />
-    <Compile Include="Assets\StarterAssets\ThirdPersonController\Scripts\ThirdPersonController.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualButton.cs" />
+    <Compile Include="Assets\Scripts\ScoreManager.cs" />
+    <Compile Include="Assets\Scripts\SnowDeformer.cs" />
+    <Compile Include="Assets\Scripts\Garage Scripts\WorldPrompt.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualJoystick.cs" />
+    <Compile Include="Assets\Scripts\FloatingText.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
+    <Compile Include="Assets\Scripts\Camera_Test.cs" />
+    <Compile Include="Assets\Scripts\SnowboarderController.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\InputSystem\StarterAssetsInputs.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\Scenes\Scripts\Infinite_Track.cs" />
-    <Compile Include="Assets\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
-    <Compile Include="Assets\Scenes\Scripts\Camera_Test.cs" />
-    <Compile Include="Assets\StarterAssets\ThirdPersonController\Scripts\BasicRigidBodyPush.cs" />
-    <Compile Include="Assets\StarterAssets\InputSystem\StarterAssetsInputs.cs" />
+    <Compile Include="Assets\Scripts\Infinite_Track.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
+    <Compile Include="Assets\Scripts\SnowboarderTricks.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\ThirdPersonController\Scripts\ThirdPersonController.cs" />
+    <Compile Include="Assets\Scripts\Track_Slope_Control.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualButton.cs" />
+    <Compile Include="Assets\Unity Asset Store\StarterAssets\ThirdPersonController\Scripts\BasicRigidBodyPush.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
@@ -80,13 +80,13 @@
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\StarterAssets\license.txt" />
+    <None Include="Assets\Unity Asset Store\StarterAssets\license.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-    <None Include="Assets\TDG Storage Solutions\Documentation.txt" />
+    <None Include="Assets\Unity Asset Store\TDG Storage Solutions\Documentation.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
