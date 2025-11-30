@@ -10,10 +10,10 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{985E1F8E-08D5-33A5-9F53-010FF580DD9B}</ProjectGuid>
+    <ProjectGuid>{61D19A0B-3251-ED5B-4577-5A4A94DAF15E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <AssemblyName>Assembly-CSharp-Editor</AssemblyName>
+    <AssemblyName>Assembly-CSharp-Editor-firstpass</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
@@ -50,7 +50,7 @@
     <UnityProjectGenerator>Package</UnityProjectGenerator>
     <UnityProjectGeneratorVersion>2.0.23</UnityProjectGeneratorVersion>
     <UnityProjectGeneratorStyle>Legacy</UnityProjectGeneratorStyle>
-    <UnityProjectType>Editor:5</UnityProjectType>
+    <UnityProjectType>EditorPlugins:7</UnityProjectType>
     <UnityBuildTarget>StandaloneWindows64:19</UnityBuildTarget>
     <UnityVersion>6000.2.8f1</UnityVersion>
   </PropertyGroup>
@@ -61,10 +61,76 @@
     <Analyzer Include="F:\Unity3d\6000.2.8f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\BruteForce\Extra\BloomKino\Other\Editor\BloomKinoEditor.cs" />
-    <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
-    <Compile Include="Assets\BruteForce\Editor\BF_TerrainEdit.cs" />
-    <Compile Include="Assets\BruteForce\Extra\BloomKino\Other\Editor\BloomKinoGraphDrawer.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineComputerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineUserEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineComputerEditorHandles.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\CapsuleEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SurfaceGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SetDistanceWindow.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\UpdateTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\RoundedRectangleEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\SplineTriggersEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SetClipRangeWindow.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\ObjectBenderEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\PrimitiveEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineRendererEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\ComputerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\TransformModuleEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineMeshEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\DreamteckSplinesEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\SpiralEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\NgonEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\LineEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\MeshGenEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\NodeEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\SplineSampleModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineMorphEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\SplineComputerDebugEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\Explorer.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\SplineTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineTracerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\EdgeColliderGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\WaveformGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\CatenaryTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineFollowerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\OffsetModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\TubeGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\ImportTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\MeshScaleModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\SizeModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\CapsuleColliderGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\WelcomeScreen.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplinePreset.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\PolygonColliderGenEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\FollowerSpeedModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\BakeMeshWindow.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\RectangleEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\ComplexSurfaceGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\DSSplineDrawer.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\ObjectControllerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\StarEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\PrimitivesModule.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineUserSubEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\ComputerMergeModule.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplineProjectorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\DSCreatePointModule.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\ComputerSplitModule.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\ObjectSpawnTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditor\DS Editor\ComputerEditorModule.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Primitives\EllipseEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\ColorModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\PathGeneratorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Sample Modifiers\RotationModifierEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\SplinePositionerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\BakeTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\LevelTerrainTool.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\LengthCalculatorEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Tools\SplineToolsWindow.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\Components\ParticleControllerEditor.cs" />
+    <Compile Include="Assets\Plugins\Dreamteck\Splines\Editor\SplineEditorWindow.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Plugins\Dreamteck\Splines\Editor\changelog.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -1388,14 +1454,6 @@
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
       <Project>{B12BD2B5-C806-0262-1501-E11D681ECB1F}</Project>
       <Name>Assembly-CSharp-firstpass</Name>
-    </ProjectReference>
-    <ProjectReference Include="Assembly-CSharp.csproj">
-      <Project>{E50178B6-ED25-193F-508C-48EE55243C5F}</Project>
-      <Name>Assembly-CSharp</Name>
-    </ProjectReference>
-    <ProjectReference Include="Assembly-CSharp-Editor-firstpass.csproj">
-      <Project>{61D19A0B-3251-ED5B-4577-5A4A94DAF15E}</Project>
-      <Name>Assembly-CSharp-Editor-firstpass</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

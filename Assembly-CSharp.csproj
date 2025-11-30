@@ -1379,29 +1379,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Dreamteck.Forever.csproj">
-      <Project>{9445B874-76BD-05AF-A362-29CFF1D032AB}</Project>
-      <Name>Dreamteck.Forever</Name>
-    </ProjectReference>
-    <ProjectReference Include="Dreamteck.Utilities.csproj">
-      <Project>{2190EB9E-1B5E-9EB6-929E-1AD757D3853C}</Project>
-      <Name>Dreamteck.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="Dreamteck.Utilities.Editor.csproj">
-      <Project>{83BCC4EE-8928-6358-FE25-FD02C564437F}</Project>
-      <Name>Dreamteck.Utilities.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Dreamteck.Splines.Editor.csproj">
-      <Project>{70A3B2E5-65CC-24E2-B02F-CC87D5880D89}</Project>
-      <Name>Dreamteck.Splines.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Dreamteck.Forever.Editor.csproj">
-      <Project>{8506069B-7C33-AB39-317A-A95C2290A76F}</Project>
-      <Name>Dreamteck.Forever.Editor</Name>
-    </ProjectReference>
-    <ProjectReference Include="Dreamteck.Splines.csproj">
-      <Project>{D0C01834-C4B8-D573-7CE7-C06AD1CF0F65}</Project>
-      <Name>Dreamteck.Splines</Name>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{B12BD2B5-C806-0262-1501-E11D681ECB1F}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
