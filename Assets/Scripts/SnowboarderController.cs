@@ -29,6 +29,10 @@ public class SnowboarderController : MonoBehaviour
     [Header("turning / carving")]
     public float turnSpeed = 90f;
     public float bodyAlignLerp = 8f;
+    
+    [Header("visual turning")]
+    [Tooltip("Extra visual yaw when carving left/right (degrees).")]
+    public float visualTurnYawDegrees = 15f;
 
     [Header("air control")]
     public float airTurnSpeed = 2f;
@@ -259,13 +263,23 @@ public class SnowboarderController : MonoBehaviour
         Vector3 newVel = newVelOnPlane + slopeNormal * normalSpeed;
         rb.linearVelocity = newVel;
 
-        // rotate body to board + slope
-        Quaternion targetRot = Quaternion.LookRotation(forwardTangent, slopeNormal);
+        // rotate body to board + slope, with a bit of extra yaw when carving
+        Vector3 displayForward = forwardTangent;
+
+        if (!braking && Mathf.Abs(horizontalInput) > 0.01f && planeSpeed > 0.1f && visualTurnYawDegrees > 0f)
+        {
+            float yawAngle = horizontalInput * visualTurnYawDegrees;
+            Quaternion yawRot = Quaternion.AngleAxis(yawAngle, slopeNormal);
+            displayForward = (yawRot * forwardTangent).normalized;
+        }
+
+        Quaternion targetRot = Quaternion.LookRotation(displayForward, slopeNormal);
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
             targetRot,
             bodyAlignLerp * Time.fixedDeltaTime
         );
+
     }
 
     void ApplyAirMovement()
