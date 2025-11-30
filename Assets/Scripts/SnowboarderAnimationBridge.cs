@@ -4,6 +4,11 @@ using UnityEngine;
 public class SnowboarderAnimationBridge : MonoBehaviour
 {
     public SnowboarderController controller;
+    public SnowboarderTricks tricks;
+
+    [Header("Bomb / Grab Settings")]
+    [Tooltip("Relative speed (0–1) at which we switch to the Bomb pose.")]
+    [Range(0f, 1f)] public float bombSpeedThreshold = 0.8f;
 
     Animator anim;
 
@@ -27,48 +32,69 @@ public class SnowboarderAnimationBridge : MonoBehaviour
         anim = GetComponent<Animator>();
         if (!controller)
             controller = GetComponentInParent<SnowboarderController>();
+        if (!tricks)
+            tricks = GetComponentInParent<SnowboarderTricks>();
     }
 
     void Update()
     {
         if (!controller || !anim) return;
 
-        // 1) speed parameter for blend tree
         var vel = controller.Body.linearVelocity;
         float speed = vel.magnitude;
+
+        // 1) speed parameter for blend tree
         float relSpeed = Mathf.InverseLerp(0f, controller.maxSpeed, speed);
         anim.SetFloat("rel_speed", relSpeed);
 
-        // 2) decide pose from controller state
         bool grounded = controller.IsGrounded;
         bool braking  = controller.IsBraking;
 
-        int pose = (int)Pose.Ride;
+        bool inAir      = !grounded;
+        bool doingTrick = tricks != null && tricks.IsDoingTrick;
+        bool flatSpin   = tricks != null && tricks.IsFlatSpinTrick;
 
-        if (!grounded)
+        int pose;
+
+        if (inAir)
         {
-            // simple: going up = jump, else generic air
-            float vertical = Vector3.Dot(vel.normalized, controller.GroundNormal);
-            if (vertical > 0.2f)
-                pose = (int)Pose.JumpRegular;
+            // --- AIR STATES ---
+            if (doingTrick)
+            {
+                // SPIN = Grab01, FLIP = Grab02
+                pose = flatSpin ? (int)Pose.Grab01 : (int)Pose.Grab02;
+            }
             else
-                pose = (int)Pose.Air;
+            {
+                // normal jump vs generic air
+                float vertical = 0f;
+                if (vel.sqrMagnitude > 0.0001f)
+                    vertical = Vector3.Dot(vel.normalized, controller.GroundNormal);
+
+                if (vertical > 0.2f)
+                    pose = (int)Pose.JumpRegular;
+                else
+                    pose = (int)Pose.Air;
+            }
         }
         else
         {
+            // --- GROUNDED STATES ---
             if (speed < 0.5f)
             {
-                // just landed / almost stopped
                 pose = (int)Pose.LandSoft;
-            }
-            else if (braking)
-            {
-                // braking crouch / shaky stance
-                pose = (int)Pose.Shaky;
             }
             else
             {
-                pose = (int)Pose.Ride;
+                // bombing = fast, on ground, not braking
+                bool isBomb = !braking && relSpeed >= bombSpeedThreshold;
+
+                if (isBomb)
+                    pose = (int)Pose.Bomb;
+                else if (braking)
+                    pose = (int)Pose.Shaky;
+                else
+                    pose = (int)Pose.Ride;
             }
         }
 

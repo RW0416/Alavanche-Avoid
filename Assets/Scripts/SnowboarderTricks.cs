@@ -44,9 +44,10 @@ public class SnowboarderTricks : MonoBehaviour
 
     // input
     Vector2 moveInput;
-    bool jumpHeld;          // only true when you press space in the air (for tricks)
+    bool jumpHeld;          // space held for tricks (only in air, after second press)
 
-    // state
+    // trick state
+    bool trickArmed;        // we pressed space in the air to start tricks
     bool inJump;
     bool prevGrounded;
 
@@ -68,6 +69,25 @@ public class SnowboarderTricks : MonoBehaviour
 
     float currentBrakeYaw;
 
+    // used by animation bridge
+    public bool IsDoingTrick
+    {
+        get { return !controller.IsGrounded && inJump && trickArmed && jumpHeld; }
+    }
+    public bool IsFlatSpinTrick
+    {
+        get
+        {
+            if (!IsDoingTrick) return false;
+
+            // compare how much spin vs flip we’ve accumulated
+            float absSpin = Mathf.Abs(spinAngle);
+            float absFlip = Mathf.Abs(flipAngle);
+
+            // small bias so tiny flip noise doesn’t cancel a real spin
+            return absSpin > absFlip + 5f;
+        }
+    }
     void Awake()
     {
         if (!controller)
@@ -94,9 +114,10 @@ public class SnowboarderTricks : MonoBehaviour
     {
         if (context.started)
         {
+            // only arm tricks if we're already in the air from a jump
             if (inJump && !controller.IsGrounded)
             {
-                // only start tricks if we're already in the air
+                trickArmed = true;
                 jumpHeld = true;
             }
         }
@@ -132,6 +153,7 @@ public class SnowboarderTricks : MonoBehaviour
             inJump = true;
 
             // tricks only start on another space press in air
+            trickArmed = false;
             jumpHeld = false;
 
             // reset trick angles and scoring each jump
@@ -149,11 +171,12 @@ public class SnowboarderTricks : MonoBehaviour
         if (justLanded)
         {
             inJump = false;
+            trickArmed = false;
             jumpHeld = false;
         }
 
         // --- trick control in air ---
-        if (inJump && !grounded && jumpHeld)
+        if (inJump && !grounded && trickArmed && jumpHeld)
         {
             float h = moveInput.x;
             float v = moveInput.y;
