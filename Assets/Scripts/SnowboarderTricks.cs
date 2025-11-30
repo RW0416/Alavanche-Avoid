@@ -21,6 +21,8 @@ public class SnowboarderTricks : MonoBehaviour
 
     [Header("Landing Upright")]
     public float uprightRecoverySpeed = 720f;
+    [Tooltip("How fast to blend back to a flat orientation on the slope after landing.")]
+    public float uprightOnSlopeLerp = 10f;
 
     [Header("Brake Pose")]
     [Tooltip("Degrees to yaw the board sideways when braking.")]
@@ -29,6 +31,14 @@ public class SnowboarderTricks : MonoBehaviour
     public float brakePoseLerp = 10f;
     [Tooltip("Extra lean angle (deg) when braking, independent of turn input.")]
     public float brakeBackLeanAngle = 20f;
+
+    [Header("Scoring")]
+    [Range(0.1f, 1f)]
+    [Tooltip("Fraction of a full 360° rotation required before awarding points (e.g. 0.7 = 70% of a rotation).")]
+    public float rotationScoreThreshold = 0.7f;
+    public int frontFlipScore = 15;
+    public int backFlipScore = 10;
+    public int spinScore = 5;
 
     Transform visualRoot;
 
@@ -114,10 +124,6 @@ public class SnowboarderTricks : MonoBehaviour
             // This makes S, S+D, and A then S all end up in the SAME pose.
             brakeSide = 1f;
         }
-        if (!braking && prevBraking)
-        {
-            // brake ended; yaw will blend back to 0
-        }
         prevBraking = braking;
 
         // --- jump transitions ---
@@ -182,25 +188,27 @@ public class SnowboarderTricks : MonoBehaviour
 
             spinAccum += Mathf.Abs(deltaSpin);
 
-            if (frontFlipAccum >= 360f)
+            float threshold = 360f * rotationScoreThreshold;
+
+            if (frontFlipAccum >= threshold)
             {
-                int count = Mathf.FloorToInt(frontFlipAccum / 360f);
-                frontFlipAccum -= 360f * count;
-                AwardScore(15 * count);
+                int count = Mathf.FloorToInt(frontFlipAccum / threshold);
+                frontFlipAccum -= threshold * count;
+                AwardScore(frontFlipScore * count);
             }
 
-            if (backFlipAccum >= 360f)
+            if (backFlipAccum >= threshold)
             {
-                int count = Mathf.FloorToInt(backFlipAccum / 360f);
-                backFlipAccum -= 360f * count;
-                AwardScore(10 * count);
+                int count = Mathf.FloorToInt(backFlipAccum / threshold);
+                backFlipAccum -= threshold * count;
+                AwardScore(backFlipScore * count);
             }
 
-            if (spinAccum >= 360f)
+            if (spinAccum >= threshold)
             {
-                int count = Mathf.FloorToInt(spinAccum / 360f);
-                spinAccum -= 360f * count;
-                AwardScore(5 * count);
+                int count = Mathf.FloorToInt(spinAccum / threshold);
+                spinAccum -= threshold * count;
+                AwardScore(spinScore * count);
             }
 
             lastFlipAngle = flipAngle;
@@ -210,6 +218,7 @@ public class SnowboarderTricks : MonoBehaviour
         // --- recover upright when on ground ---
         if (grounded && !inJump)
         {
+            // bring trick angles back towards neutral
             flipAngle = Mathf.MoveTowardsAngle(flipAngle, 0f, uprightRecoverySpeed * dt);
             spinAngle = Mathf.MoveTowardsAngle(spinAngle, 0f, uprightRecoverySpeed * dt);
 
@@ -258,8 +267,29 @@ public class SnowboarderTricks : MonoBehaviour
         // 4) mesh orientation fix
         Quaternion offsetRot = Quaternion.Euler(0f, modelRotationOffset, 0f);
 
-        // final rotation: physics → brake → lean → tricks → mesh offset
+        // base final rotation: physics → brake → lean → tricks → mesh offset
         Quaternion targetRot = baseRot * brakeRot * leanRot * trickRot * offsetRot;
+
+        // 5) extra upright correction on slope when grounded (keeps you horizontal, not nose-diving)
+        if (grounded && !inJump)
+        {
+            Vector3 slopeUp = controller.GroundNormal;
+            Vector3 currentForward = targetRot * Vector3.forward;
+
+            // flatten forward onto slope plane so you end up lying "horizontally" on the slope
+            Vector3 flatForward = Vector3.ProjectOnPlane(currentForward, slopeUp);
+            if (flatForward.sqrMagnitude < 0.0001f)
+            {
+                // fallback: use right axis if forward is nearly vertical
+                flatForward = Vector3.ProjectOnPlane(targetRot * Vector3.right, slopeUp);
+            }
+
+            if (flatForward.sqrMagnitude > 0.0001f)
+            {
+                Quaternion uprightOnSlope = Quaternion.LookRotation(flatForward.normalized, slopeUp);
+                targetRot = Quaternion.Slerp(targetRot, uprightOnSlope, uprightOnSlopeLerp * dt);
+            }
+        }
 
         visualRoot.rotation = Quaternion.Slerp(
             visualRoot.rotation,
