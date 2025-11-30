@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6697987055888774790}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_Seg_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -48,7 +48,7 @@ GameObject:
   - component: {fileID: 3652264990281372265}
   - component: {fileID: 7687493660575450299}
   - component: {fileID: 6544230904282240060}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_Temp (5)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38715,7 +38715,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3848313061791752923}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38746,7 +38746,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4369840503181743581}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Entry
   m_TagString: Untagged
   m_Icon: {fileID: 0}

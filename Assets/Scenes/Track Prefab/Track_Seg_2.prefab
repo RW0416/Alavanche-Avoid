@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3559799854646846425}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Exit
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1932543936833632358}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Entry
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 2656208252829491280}
   - component: {fileID: 8917715578803840207}
   - component: {fileID: 7167146613450797953}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_Temp (6)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38743,7 +38743,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3834419299405379612}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_Seg_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}

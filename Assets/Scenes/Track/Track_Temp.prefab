@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8335635402220733744}
   - component: {fileID: 6390938275171047104}
   - component: {fileID: 3110232672567522419}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Track_Temp
   m_TagString: Untagged
   m_Icon: {fileID: 0}
