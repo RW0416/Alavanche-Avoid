@@ -3,31 +3,31 @@ using UnityEngine.InputSystem;
 
 public class SnowboarderTricks : MonoBehaviour
 {
-    [Header("references")]
+    [Header("References")]
     public SnowboarderController controller;
 
-    [Header("visual orientation fix")]
-    [Tooltip("rotate the character mesh 90 or -90 degrees so the board faces downhill")]
+    [Header("Visual Orientation Fix")]
+    [Tooltip("Rotate the character mesh 90 or -90 degrees so the board faces downhill.")]
     public float modelRotationOffset = -90f;
 
-    [Header("visual turn / lean (no yaw)")]
-    [Tooltip("how much the rider leans when turning left/right")]
-    public float maxTurnYaw = 25f;        // lean angle
-    public float leanLerp = 15f;          // general pose smoothing
+    [Header("Visual Turn / Lean (No Extra Yaw)")]
+    [Tooltip("How much the rider leans when turning left/right.")]
+    public float maxTurnYaw = 25f;
+    public float leanLerp = 15f;
 
-    [Header("trick speeds")]
-    public float flipSpeed = 360f;        // degrees per second
-    public float spinSpeed = 360f;        // degrees per second
+    [Header("Trick Speeds")]
+    public float flipSpeed = 360f;   // degrees per second, front/back
+    public float spinSpeed = 360f;   // degrees per second, side spin
 
-    [Header("landing upright")]
+    [Header("Landing Upright")]
     public float uprightRecoverySpeed = 720f;
 
-    [Header("brake pose")]
-    [Tooltip("degrees to yaw the board sideways when braking")]
+    [Header("Brake Pose")]
+    [Tooltip("Degrees to yaw the board sideways when braking.")]
     public float brakeYawAngle = 90f;
-    [Tooltip("how fast to blend in/out the brake yaw")]
+    [Tooltip("How fast to blend in/out the brake yaw.")]
     public float brakePoseLerp = 10f;
-    [Tooltip("extra lean angle (deg) when braking, independent of turn input")]
+    [Tooltip("Extra lean angle (deg) when braking, independent of turn input.")]
     public float brakeBackLeanAngle = 20f;
 
     Transform visualRoot;
@@ -42,7 +42,7 @@ public class SnowboarderTricks : MonoBehaviour
 
     // braking state for stable pose
     bool prevBraking;
-    float brakeSide = 1f;   // +1 = right, -1 = left
+    float brakeSide = 1f;   // +1 = fixed brake orientation
 
     // trick angles (local)
     float flipAngle;        // front/back flip around local X
@@ -66,7 +66,7 @@ public class SnowboarderTricks : MonoBehaviour
         visualRoot = controller != null ? controller.visualRoot : null;
         if (!visualRoot)
         {
-            Debug.LogError("SnowboarderTricks: visualRoot not set. assign the mesh child in the controller.");
+            Debug.LogError("SnowboarderTricks: visualRoot not set. Assign the mesh child in the controller.");
             enabled = false;
         }
     }
@@ -78,15 +78,15 @@ public class SnowboarderTricks : MonoBehaviour
     }
 
     // from PlayerInput (Jump) – ONLY for tricks now
-    // first space press (on ground) is handled by SnowboarderController
-    // pressing space again in the air arms tricks
+    // First space press (on ground) is handled by SnowboarderController.
+    // Pressing space again in the air arms tricks.
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            // only start tricks if we're already in the air
             if (inJump && !controller.IsGrounded)
             {
+                // only start tricks if we're already in the air
                 jumpHeld = true;
             }
         }
@@ -107,15 +107,12 @@ public class SnowboarderTricks : MonoBehaviour
         bool justLanded = grounded && !prevGrounded;
         bool braking = grounded && controller.IsBraking;
 
-        // --- brake start / end: lock a stable side ---
+        // --- brake start / end: lock a stable side (always same) ---
         if (braking && !prevBraking)
         {
-            // when S is first pressed, decide which side to face ONCE
-            // if you're holding D, use that side, otherwise default to right
-            if (Mathf.Abs(moveInput.x) > 0.1f)
-                brakeSide = Mathf.Sign(moveInput.x);
-            else
-                brakeSide = 1f;   // default to "S + D" look
+            // Always use the same orientation for brake pose.
+            // This makes S, S+D, and A then S all end up in the SAME pose.
+            brakeSide = 1f;
         }
         if (!braking && prevBraking)
         {
@@ -131,6 +128,7 @@ public class SnowboarderTricks : MonoBehaviour
             // tricks only start on another space press in air
             jumpHeld = false;
 
+            // reset trick angles and scoring each jump
             flipAngle = 0f;
             spinAngle = 0f;
 
@@ -237,12 +235,12 @@ public class SnowboarderTricks : MonoBehaviour
         }
         else if (grounded && braking)
         {
-            // separate brake lean – constant "back" lean
+            // separate brake lean – lean back instead of forward
             targetLean = -brakeBackLeanAngle;
         }
         Quaternion leanRot = Quaternion.AngleAxis(targetLean, Vector3.forward);
 
-        // 2) brake pose yaw – fixed side while braking, independent of A/D once locked
+        // 2) brake pose yaw – fixed side while braking, independent of A/D
         float targetBrakeYaw = 0f;
         if (grounded && braking)
         {
