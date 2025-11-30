@@ -10878,15 +10878,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4580615746060970, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.0070000365
+      value: -0.18555668
       objectReference: {fileID: 0}
     - target: {fileID: 4580615746060970, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.024002075
+      value: -0.0029830933
       objectReference: {fileID: 0}
     - target: {fileID: 4580615746060970, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.015014648
+      value: -0.020477295
       objectReference: {fileID: 0}
     - target: {fileID: 4580615746060970, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11428,13 +11428,13 @@ ParentConstraint:
   m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
-  m_TranslationAtRest: {x: -0.007, y: 0.024002075, z: 0.015014648}
+  m_TranslationAtRest: {x: -0.18555662, y: -0.0029830933, z: -0.020477295}
   m_RotationAtRest: {x: 0, y: 90, z: 0}
   m_TranslationOffsets:
-  - {x: -0.04449463, y: -0.026985168, z: -0.12144343}
-  - {x: 0.04449463, y: 0.026985168, z: -0.121443436}
+  - {x: -0.07998657, y: 0, z: -0.30000007}
+  - {x: 0.07998657, y: 0, z: -0.30000007}
   m_RotationOffsets:
-  - {x: 0, y: 0, z: -180}
+  - {x: 0, y: 0, z: 180}
   - {x: 0, y: 0, z: 0}
   m_AffectTranslationX: 1
   m_AffectTranslationY: 1
