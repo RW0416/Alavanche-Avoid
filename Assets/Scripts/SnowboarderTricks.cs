@@ -4,85 +4,72 @@ using UnityEngine.InputSystem;
 public class SnowboarderTricks : MonoBehaviour
 {
     [Header("References")]
-    public SnowboarderController controller;   // root with rigidbody + movement
+    public SnowboarderController controller;
+
+    [Header("Visual Orientation Fix")]
+    [Tooltip("Rotate the character mesh 90 or -90 degrees so the board faces downhill.")]
+    public float modelRotationOffset = -90f; 
 
     [Header("Visual Turn / Lean")]
-    public float maxTurnYaw = 25f;     // visual twist into the turn (deg)
-    public float leanLerp = 10f;       // smoothing for all visual rotations
+    public float maxTurnYaw = 35f;     
+    public float leanLerp = 15f;       // Smoother visual lerp
 
     [Header("Trick Speeds")]
-    public float flipSpeed = 360f;     // deg/sec for W/S flips
-    public float spinSpeed = 360f;     // deg/sec for A/D spins
+    public float flipSpeed = 360f;     
+    public float spinSpeed = 360f;     
 
     [Header("Landing Upright")]
-    public float uprightRecoverySpeed = 540f;  // deg/sec to recover to upright while grounded
+    public float uprightRecoverySpeed = 720f;  // Fast recovery on landing
 
     Transform visualRoot;
 
     // input
     Vector2 moveInput;
-    float horizontalInput;
-    float verticalInput;
-    bool jumpHeld;        // is Space currently held?
+    bool jumpHeld;
 
     // trick state
-    bool trickArmed;      // we pressed Space while already in the air (this jump)
-    bool inJump;          // currently airborne since last time we were grounded
+    bool trickArmed;      
+    bool inJump;          
 
-    float flipAngle;      // rotation around board right axis (front/back flip)
-    float spinAngle;      // rotation around board up axis   (flat spin)
+    float flipAngle;      
+    float spinAngle;      
 
-    // scoring accumulators for this jump
-    float frontFlipAccum;   // positive flip degrees
-    float backFlipAccum;    // negative flip degrees (stored positive)
-    float spinAccum;        // absolute spin degrees
+    // scoring accumulators
+    float frontFlipAccum;   
+    float backFlipAccum;    
+    float spinAccum;        
 
     float lastFlipAngle;
     float lastSpinAngle;
 
     bool prevGrounded;
-
-    // orientation captured at jump start – used for flip/spin axes
     Quaternion jumpBaseRot;
 
     void Awake()
     {
-        if (!controller)
-            controller = GetComponent<SnowboarderController>();
-
-        if (!controller)
-        {
-            Debug.LogError("SnowboarderTricks: no SnowboarderController assigned.");
-            enabled = false;
-            return;
-        }
-
+        if (!controller) controller = GetComponent<SnowboarderController>();
+        
         visualRoot = controller.visualRoot;
         if (!visualRoot)
         {
-            Debug.LogError("SnowboarderTricks: controller.visualRoot is not set.");
+            Debug.LogError("SnowboarderTricks: visualRoot is null. Assign the child object containing the mesh in the inspector.");
             enabled = false;
+            return;
         }
-
+        
         jumpBaseRot = controller.transform.rotation;
     }
 
-    // same Move input as controller
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
     }
 
-    // SPACE:
-    // - first press on ground: jump (controller handles it); we just record jumpHeld
-    // - press that STARTS while in the air: arms tricks for THIS jump
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.started)
         {
             jumpHeld = true;
-
-            // only arm tricks if this press begins while in the air during a jump
             if (inJump && !controller.IsGrounded)
             {
                 trickArmed = true;
@@ -91,7 +78,6 @@ public class SnowboarderTricks : MonoBehaviour
         else if (context.canceled)
         {
             jumpHeld = false;
-            // releasing Space cancels trick prep; need a new mid-air press next time
             trickArmed = false;
         }
     }
@@ -100,178 +86,132 @@ public class SnowboarderTricks : MonoBehaviour
     {
         if (!controller || !visualRoot) return;
 
-        horizontalInput = moveInput.x;
-        verticalInput   = moveInput.y;
+        float dt = Time.deltaTime;
+        bool grounded = controller.IsGrounded;
+        bool justLanded = grounded && !prevGrounded;
+        bool justLeftGround = !grounded && prevGrounded;
 
-        bool grounded        = controller.IsGrounded;
-        bool justLanded      = grounded && !prevGrounded;
-        bool justLeftGround  = !grounded && prevGrounded;
-        float dt             = Time.deltaTime;
-
-        // ---------- JUMP STATE TRANSITIONS ----------
+        // --- TRANSITIONS ---
 
         if (justLeftGround)
         {
-            // New jump starts here: reset EVERYTHING so this jump is fresh.
             inJump = true;
-            trickArmed = false;   // must press Space again in air to arm
-
+            trickArmed = false;
             flipAngle = 0f;
             spinAngle = 0f;
-
             frontFlipAccum = 0f;
-            backFlipAccum  = 0f;
-            spinAccum      = 0f;
-
+            backFlipAccum = 0f;
+            spinAccum = 0f;
             lastFlipAngle = 0f;
             lastSpinAngle = 0f;
 
-            // capture facing at takeoff – tricks stay aligned to this
+            // Capture rotation at takeoff for trick axes
             jumpBaseRot = controller.transform.rotation;
-
-            // make sure visuals start aligned with the board for this jump
-            visualRoot.rotation = jumpBaseRot;
         }
 
         if (justLanded)
         {
-            // This jump is over. Any new tricks require a new mid-air press next time.
             inJump = false;
             trickArmed = false;
+            
+            // CRITICAL FIX: Prevent freak-out on landing.
+            // Instantly snap angles closer to 0 or multiple of 360 so the visual lerp doesn't spin wildly.
+            flipAngle %= 360f;
+            spinAngle %= 360f;
+            
+            if (flipAngle > 180) flipAngle -= 360;
+            if (flipAngle < -180) flipAngle += 360;
+            if (spinAngle > 180) spinAngle -= 360;
+            if (spinAngle < -180) spinAngle += 360;
         }
 
-        // ---------- IN AIR: manual flips & spins (two-step: must be armed) ----------
-
-        float prevFlip = flipAngle;
-        float prevSpin = spinAngle;
+        // --- AIR TRICKS ---
 
         if (!grounded && inJump && trickArmed && jumpHeld)
         {
-            bool wantFlip = Mathf.Abs(verticalInput)   > 0.1f;
-            bool wantSpin = Mathf.Abs(horizontalInput) > 0.1f;
+            float h = moveInput.x;
+            float v = moveInput.y;
+            bool wantFlip = Mathf.Abs(v) > 0.1f;
+            bool wantSpin = Mathf.Abs(h) > 0.1f;
 
-            if (wantFlip && !wantSpin)
+            // Prioritize inputs to avoid confusing diagonal rotation
+            if (wantSpin)
             {
-                // PURE FLIP: lock spin, only front/back (relative to facing at jump)
-                spinAngle = 0f;
-
-                if (verticalInput > 0.1f)
-                {
-                    flipAngle += flipSpeed * dt;      // front flip
-                }
-                else if (verticalInput < -0.1f)
-                {
-                    flipAngle -= flipSpeed * dt;      // back flip
-                }
+                spinAngle += spinSpeed * h * dt;
             }
-            else if (wantSpin && !wantFlip)
+            else if (wantFlip)
             {
-                // PURE FLAT SPIN: lock flip, only yaw around facing at jump
-                flipAngle = 0f;
-                spinAngle += spinSpeed * horizontalInput * dt;
-            }
-            else if (wantSpin && wantFlip)
-            {
-                // both pressed: treat as SPIN priority, keep it flat
-                flipAngle = 0f;
-                spinAngle += spinSpeed * horizontalInput * dt;
-            }
-            else
-            {
-                // armed + Space held but no directional input:
-                // DO NOTHING, keep current angles exactly as they are
+                // Invert V input if needed for "pull back to backflip" feel
+                if (v > 0.1f) flipAngle += flipSpeed * dt;
+                else flipAngle -= flipSpeed * dt;
             }
         }
-        // if not inJump, not armed, or not holding Space → we do not touch angles in air
 
-        // ---------- SCORING (per jump) ----------
-
-        if (!grounded && inJump && trickArmed && jumpHeld)
+        // --- SCORING ---
+        if (!grounded && inJump)
         {
             float deltaFlip = flipAngle - lastFlipAngle;
             float deltaSpin = spinAngle - lastSpinAngle;
 
-            if (deltaFlip > 0f)
-            {
-                frontFlipAccum += deltaFlip;
-            }
-            else if (deltaFlip < 0f)
-            {
-                backFlipAccum += -deltaFlip;
-            }
-
+            if (deltaFlip > 0) frontFlipAccum += deltaFlip;
+            else backFlipAccum += -deltaFlip;
+            
             spinAccum += Mathf.Abs(deltaSpin);
 
-            // award per full 360
-            while (frontFlipAccum >= 360f)
-            {
-                frontFlipAccum -= 360f;
-                AwardScore(15);   // front flip
-            }
-
-            while (backFlipAccum >= 360f)
-            {
-                backFlipAccum -= 360f;
-                AwardScore(10);   // back flip
-            }
-
-            while (spinAccum >= 360f)
-            {
-                spinAccum -= 360f;
-                AwardScore(5);    // flat spin
-            }
+            while (frontFlipAccum >= 360f) { frontFlipAccum -= 360f; AwardScore(15); }
+            while (backFlipAccum >= 360f) { backFlipAccum -= 360f; AwardScore(10); }
+            while (spinAccum >= 360f) { spinAccum -= 360f; AwardScore(5); }
+            
+            lastFlipAngle = flipAngle;
+            lastSpinAngle = spinAngle;
         }
 
-        lastFlipAngle = flipAngle;
-        lastSpinAngle = spinAngle;
-
-        // ---------- GROUND: smooth back to upright only while grounded ----------
-
+        // --- LANDING RECOVERY ---
         if (grounded)
         {
+            // Smoothly unwind tricks to 0
             flipAngle = Mathf.MoveTowardsAngle(flipAngle, 0f, uprightRecoverySpeed * dt);
             spinAngle = Mathf.MoveTowardsAngle(spinAngle, 0f, uprightRecoverySpeed * dt);
         }
 
         prevGrounded = grounded;
-
         UpdateVisualRotation(dt);
     }
 
     void UpdateVisualRotation(float dt)
     {
-        if (!controller || !visualRoot) return;
-
-        // base orientation from physics object (for where the board actually is)
+        // 1. Get Base Rotation (Physics facing)
         Quaternion baseRot = controller.transform.rotation;
+        
+        // 2. Determine Trick Axes
+        // If in air, use the takeoff rotation so tricks don't wobble if physics body twists slightly
+        Quaternion trickRefRot = inJump ? jumpBaseRot : baseRot;
+        
+        Vector3 trickRight = trickRefRot * Vector3.right;
+        Vector3 trickUp    = trickRefRot * Vector3.up;
 
-        // axes for tricks are locked to facing at jump start, not travel direction
-        Vector3 trickRight = (inJump ? (jumpBaseRot * Vector3.right) : (baseRot * Vector3.right));
-        Vector3 trickUp    = (inJump ? (jumpBaseRot * Vector3.up)    : (baseRot * Vector3.up));
-
-        // small yaw twist into the turn on the ground only (no weird tilting)
-        float turnYaw = controller.IsGrounded ? horizontalInput * maxTurnYaw : 0f;
+        // 3. Ground Turn Lean (only when not doing tricks)
+        float turnYaw = (controller.IsGrounded && !inJump) ? moveInput.x * maxTurnYaw : 0f;
         Quaternion turnRot = Quaternion.AngleAxis(turnYaw, baseRot * Vector3.up);
 
-        // tricks
+        // 4. Trick Rotations
         Quaternion flipRot = Quaternion.AngleAxis(flipAngle, trickRight);
         Quaternion spinRot = Quaternion.AngleAxis(spinAngle, trickUp);
 
-        // order: base → turn → spin → flip
-        Quaternion targetRot = baseRot * turnRot * spinRot * flipRot;
+        // 5. Apply Model Offset (The Orientation Fix)
+        // This permanently rotates the mesh (e.g., -90 degrees Y) so "Forward" becomes "Sideways"
+        Quaternion offsetRot = Quaternion.Euler(0, modelRotationOffset, 0);
 
-        visualRoot.rotation = Quaternion.Slerp(
-            visualRoot.rotation,
-            targetRot,
-            leanLerp * dt
-        );
+        // Combine: Base -> Offset -> Turn -> Spin -> Flip
+        // Note: We apply offset to the base, then apply tricks on top
+        Quaternion finalRot = baseRot * turnRot * spinRot * flipRot * offsetRot;
+
+        visualRoot.rotation = Quaternion.Slerp(visualRoot.rotation, finalRot, leanLerp * dt);
     }
 
     void AwardScore(int amount)
     {
-        if (ScoreManager.Instance == null) return;
-        if (controller == null) return;
-
-        ScoreManager.Instance.AddScore(amount, controller.transform);
+        if (ScoreManager.Instance != null && controller != null)
+            ScoreManager.Instance.AddScore(amount, controller.transform);
     }
 }

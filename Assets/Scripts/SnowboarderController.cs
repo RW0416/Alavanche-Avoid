@@ -4,29 +4,34 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody))]
 public class SnowboarderController : MonoBehaviour
 {
-    [Header("References")]
+    [Header("references")]
     public Transform visualRoot;
     public LayerMask groundMask = ~0;
 
-    [Header("Local Gravity")]
+    [Header("local gravity")]
     public float slopeGravity = 25f;
     public float stickToGroundGravity = 40f;
+    public float airGravity = 30f;
 
-    [Header("Ground Movement")]
+    [Header("ground movement (feel)")]
+    public bool alwaysAccelerate = true;
     public float pushAcceleration = 12f;
-    public float maxSpeed = 30f;
-    public float baseGroundFriction = 0.6f;
-    public float carveExtraFriction = 0.4f;
-    public float brakeExtraFriction = 2f;
+    public float maxSpeed = 35f;
+    [Tooltip("base sideways friction, smaller = more slide")]
+    public float baseGroundFriction = 5f;
+    [Tooltip("extra friction while turning")]
+    public float carveExtraFriction = 8f;
+    [Tooltip("extra friction while braking")]
+    public float brakeExtraFriction = 16f;
     public float brakeStrength = 18f;
 
-    [Header("Turning / Carving")]
-    public float turnSpeed = 90f;          // mostly for side force
-    public float carveAcceleration = 6f;
-    public float bodyAlignLerp = 10f;
+    [Header("turn / carve")]
+    public float turnSpeed = 90f;
+    public float bodyAlignLerp = 8f;
 
-    [Header("Jump")]
-    public float jumpForce = 6f;
+    [Header("air control")]
+    public float airTurnSpeed = 2f;
+    public float jumpForce = 8f;
     public float groundCheckDistance = 0.4f;
 
     Rigidbody rb;
@@ -38,11 +43,15 @@ public class SnowboarderController : MonoBehaviour
     bool isGrounded;
     bool wasGrounded;
     Vector3 groundNormal = Vector3.up;
+    Vector3 smoothGroundNormal = Vector3.up;
 
     bool jumpRequested;
     bool hasJumpedSinceGrounded;
 
-    // ---- public for tricks script ----
+    // like old BordDirection
+    Vector3 rideDirection = Vector3.forward;
+
+    // public api for tricks etc
     public bool IsGrounded => isGrounded;
     public bool WasGrounded => wasGrounded;
     public Vector3 GroundNormal => groundNormal;
@@ -55,16 +64,17 @@ public class SnowboarderController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-
-        // we handle gravity manually
-        rb.useGravity = false;
-
-        // allow yaw, block tipping over
+        rb.useGravity = false; // we handle gravity
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+
+        // let our own code control slide, keep this low
+        rb.linearDamping = 0.0f;
+        rb.angularDamping = 0.05f;
+
+        rideDirection = transform.forward;
     }
 
-    // ------------ INPUT ------------
-
+    // input from new input system
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
@@ -78,12 +88,10 @@ public class SnowboarderController : MonoBehaviour
         }
     }
 
-    // ------------ UPDATE LOOPS ------------
-
     void Update()
     {
         horizontalInput = moveInput.x;
-        verticalInput   = moveInput.y;
+        verticalInput = moveInput.y;
     }
 
     void FixedUpdate()
@@ -92,151 +100,166 @@ public class SnowboarderController : MonoBehaviour
         ApplyLocalGravity();
 
         if (isGrounded)
-        {
             ApplyGroundMovement();
-        }
+        else
+            ApplyAirMovement();
 
         HandleJump();
         ClampMaxSpeed();
     }
 
-    // ------------ GROUND CHECK (ignores own collider) ------------
-
     void UpdateGroundInfo()
     {
         wasGrounded = isGrounded;
         isGrounded = false;
-        groundNormal = Vector3.up;
 
-        // ray length based on collider size, not some random big number
+        if (groundNormal.sqrMagnitude < 0.1f)
+            groundNormal = Vector3.up;
+
         Collider col = GetComponent<Collider>();
-        float castDistance = col ? col.bounds.extents.y + 0.5f : 2f;
+        float castDistance = col ? col.bounds.extents.y + 0.5f : 1.5f;
 
-        Vector3 origin = transform.position + Vector3.up * 0.1f;
-        Ray ray = new Ray(origin, Vector3.down);
+        Vector3 origin = transform.position + Vector3.up * 0.2f;
+        RaycastHit hit;
 
-        RaycastHit[] hits = Physics.RaycastAll(
-            ray,
-            castDistance,
-            groundMask,
-            QueryTriggerInteraction.Ignore
-        );
-
-        float closest = float.MaxValue;
-        RaycastHit bestHit = new RaycastHit();
-        bool found = false;
-
-        foreach (var h in hits)
+        if (Physics.SphereCast(origin, 0.2f, Vector3.down,
+            out hit, castDistance, groundMask, QueryTriggerInteraction.Ignore))
         {
-            if (!h.collider) continue;
-
-            // ignore our own colliders
-            if (h.rigidbody == rb) continue;
-            if (h.collider.transform.IsChildOf(transform)) continue;
-
-            if (h.distance < closest)
+            if (hit.collider.transform != transform &&
+                !hit.collider.transform.IsChildOf(transform))
             {
-                closest = h.distance;
-                bestHit = h;
-                found = true;
+                isGrounded = true;
+                groundNormal = hit.normal;
             }
         }
 
-        if (found)
-        {
-            isGrounded = true;
-            groundNormal = bestHit.normal;
-        }
+        smoothGroundNormal = Vector3.Slerp(
+            smoothGroundNormal,
+            groundNormal,
+            15f * Time.fixedDeltaTime
+        );
 
         if (isGrounded && !wasGrounded)
-        {
             hasJumpedSinceGrounded = false;
-        }
     }
-
-
-    // ------------ LOCAL GRAVITY (world-down) ------------
 
     void ApplyLocalGravity()
     {
         if (isGrounded)
         {
-            // stick to slope
-            Vector3 intoSlope = -groundNormal * stickToGroundGravity;
+            Vector3 gravityDir = -smoothGroundNormal;
+            Vector3 downhill = Vector3.ProjectOnPlane(Vector3.down, smoothGroundNormal).normalized;
 
-            // downhill = world down projected onto the surface
-            Vector3 downhill = Vector3.ProjectOnPlane(Vector3.down, groundNormal);
-            if (downhill.sqrMagnitude > 0.0001f)
-                downhill.Normalize();
-            else
-                downhill = Vector3.zero;
+            Vector3 slopeForce = downhill * slopeGravity;
+            Vector3 stickForce = gravityDir * stickToGroundGravity;
 
-            rb.AddForce(intoSlope + downhill * slopeGravity, ForceMode.Acceleration);
+            rb.AddForce(slopeForce + stickForce, ForceMode.Acceleration);
         }
         else
         {
-            // in air, just fall
-            rb.AddForce(Vector3.down * stickToGroundGravity, ForceMode.Acceleration);
+            rb.AddForce(Vector3.down * airGravity, ForceMode.Acceleration);
         }
     }
-
-    // ------------ MOVEMENT (GROUND ONLY) ------------
 
     void ApplyGroundMovement()
     {
         Vector3 vel = rb.linearVelocity;
 
-        float vNormal = Vector3.Dot(vel, groundNormal);
-        Vector3 normalVel = groundNormal * vNormal;
-        Vector3 horizontalVel = vel - normalVel;
+        // velocity on slope plane
+        Vector3 slopeNormal = smoothGroundNormal;
+        Vector3 velOnPlane = Vector3.ProjectOnPlane(vel, slopeNormal);
+        float planeSpeed = velOnPlane.magnitude;
 
-        // face actual sliding direction (or keep current if almost stopped)
-        if (horizontalVel.sqrMagnitude > 0.01f)
+        // keep a board direction similar to old BordDirection
+        if (planeSpeed > 0.5f)
         {
-            Vector3 moveDir = horizontalVel.normalized;
-            Quaternion targetRot = Quaternion.LookRotation(moveDir, groundNormal);
-            transform.rotation = Quaternion.Slerp(
-                transform.rotation,
-                targetRot,
-                bodyAlignLerp * Time.fixedDeltaTime
-            );
+            rideDirection = velOnPlane.normalized;
+        }
+        else
+        {
+            rideDirection = Vector3.ProjectOnPlane(rideDirection, slopeNormal).normalized;
+            if (rideDirection.sqrMagnitude < 0.1f)
+                rideDirection = Vector3.ProjectOnPlane(transform.forward, slopeNormal).normalized;
         }
 
-        // friction
-        float friction = baseGroundFriction;
-        if (Mathf.Abs(horizontalInput) > 0.01f)
-            friction += carveExtraFriction;
-        if (verticalInput < 0f)
-            friction += brakeExtraFriction;
+        bool isBraking = verticalInput < -0.1f;
 
-        horizontalVel -= horizontalVel * (friction * Time.fixedDeltaTime);
-
-        // strong brake with S
-        if (verticalInput < 0f && horizontalVel.sqrMagnitude > 0.0001f)
+        // turn by rotating around slope normal (can’t steer while braking)
+        if (!isBraking && Mathf.Abs(horizontalInput) > 0.01f && planeSpeed > 0.1f)
         {
-            float speed = horizontalVel.magnitude;
-            float newSpeed = Mathf.Max(0f, speed - brakeStrength * Time.fixedDeltaTime);
-            horizontalVel = horizontalVel.normalized * newSpeed;
+            float turnAngle = horizontalInput * turnSpeed * Time.fixedDeltaTime;
+            Quaternion turnRot = Quaternion.AngleAxis(turnAngle, slopeNormal);
+            rideDirection = (turnRot * rideDirection).normalized;
+            velOnPlane = turnRot * velOnPlane;
         }
 
-        // small push with W
-        if (verticalInput > 0f)
+        // basis along board and sideways
+        Vector3 forwardTangent = rideDirection;
+        Vector3 rightTangent = Vector3.Cross(slopeNormal, forwardTangent).normalized;
+
+        float forwardSpeed = Vector3.Dot(velOnPlane, forwardTangent);
+        float sideSpeed = Vector3.Dot(velOnPlane, rightTangent);
+        float normalSpeed = Vector3.Dot(vel, slopeNormal);
+
+        // sideways friction (slide vs carve)
+        float lateralFriction = baseGroundFriction;
+        if (Mathf.Abs(horizontalInput) > 0.1f)
+            lateralFriction += carveExtraFriction;
+        if (isBraking)
+            lateralFriction += brakeExtraFriction;
+
+        float sideSign = Mathf.Sign(sideSpeed);
+        float sideMag = Mathf.Abs(sideSpeed);
+        float maxSideLoss = lateralFriction * Time.fixedDeltaTime;
+
+        if (sideMag <= maxSideLoss)
+            sideSpeed = 0f;
+        else
+            sideSpeed -= sideSign * maxSideLoss;
+
+        // small forward drag so you don’t accelerate forever
+        float forwardDrag = 0.5f * baseGroundFriction * Time.fixedDeltaTime;
+        if (forwardSpeed > 0)
+            forwardSpeed = Mathf.Max(0f, forwardSpeed - forwardDrag);
+        else if (forwardSpeed < 0)
+            forwardSpeed = Mathf.Min(0f, forwardSpeed + forwardDrag);
+
+        // acceleration along board dir
+        bool wantsAccelerate = alwaysAccelerate ? !isBraking : verticalInput > 0.1f;
+        if (wantsAccelerate)
+            forwardSpeed += pushAcceleration * Time.fixedDeltaTime;
+
+        // active brake
+        if (isBraking)
         {
-            Vector3 pushDir = Vector3.ProjectOnPlane(transform.forward, groundNormal).normalized;
-            rb.AddForce(pushDir * pushAcceleration, ForceMode.Acceleration);
+            float brakeAmount = brakeStrength * Time.fixedDeltaTime;
+            if (Mathf.Abs(forwardSpeed) <= brakeAmount)
+                forwardSpeed = 0f;
+            else
+                forwardSpeed -= Mathf.Sign(forwardSpeed) * brakeAmount;
         }
 
-        // carving = side force only, rotation handled by velocity alignment
-        if (Mathf.Abs(horizontalInput) > 0.01f && horizontalVel.sqrMagnitude > 0.01f)
-        {
-            Vector3 sideDir = Vector3.Cross(groundNormal, transform.forward).normalized;
-            rb.AddForce(sideDir * (horizontalInput * carveAcceleration), ForceMode.Acceleration);
-        }
+        // rebuild velocity
+        Vector3 newVelOnPlane = forwardTangent * forwardSpeed + rightTangent * sideSpeed;
+        Vector3 newVel = newVelOnPlane + slopeNormal * normalSpeed;
+        rb.linearVelocity = newVel;
 
-        rb.linearVelocity = horizontalVel + normalVel;
+        // orient body to board direction + slope
+        Quaternion targetRot = Quaternion.LookRotation(forwardTangent, slopeNormal);
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRot,
+            bodyAlignLerp * Time.fixedDeltaTime
+        );
     }
 
-    // ------------ JUMP (once per landing) ------------
+    void ApplyAirMovement()
+    {
+        if (Mathf.Abs(horizontalInput) > 0.1f)
+        {
+            rb.AddTorque(Vector3.up * horizontalInput * airTurnSpeed, ForceMode.Acceleration);
+        }
+    }
 
     void HandleJump()
     {
@@ -245,34 +268,27 @@ public class SnowboarderController : MonoBehaviour
 
         jumpRequested = false;
 
-        if (!isGrounded)
-            return;
-
-        if (hasJumpedSinceGrounded)
+        if (!isGrounded || hasJumpedSinceGrounded)
             return;
 
         hasJumpedSinceGrounded = true;
 
+        // flatten vertical so jump height is consistent
         Vector3 vel = rb.linearVelocity;
-        float vNormal = Vector3.Dot(vel, groundNormal);
-        if (vNormal < 0f)
-        {
-            vel -= groundNormal * vNormal;
-            rb.linearVelocity = vel;
-        }
+        vel.y = 0;
+        rb.linearVelocity = vel;
 
-        rb.AddForce(groundNormal * jumpForce, ForceMode.VelocityChange);
+        Vector3 jumpDir = (Vector3.up + groundNormal).normalized;
+        rb.AddForce(jumpDir * jumpForce, ForceMode.VelocityChange);
     }
-
-    // ------------ SPEED LIMIT ------------
 
     void ClampMaxSpeed()
     {
-        Vector3 v = rb.linearVelocity;
-        float speed = v.magnitude;
+        Vector3 vel = rb.linearVelocity;
+        float speed = vel.magnitude;
         if (speed > maxSpeed)
         {
-            rb.linearVelocity = v * (maxSpeed / speed);
+            rb.linearVelocity = vel * (maxSpeed / speed);
         }
     }
 }

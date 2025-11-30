@@ -17,7 +17,7 @@ public class InfiniteTrackRandom : MonoBehaviour
     {
         if (trackPrefabs == null || trackPrefabs.Length == 0)
         {
-            Debug.LogError("no prefab");
+            Debug.LogError("InfiniteTrackRandom: ���� Inspector ��������һ�� trackPrefab��");
             enabled = false;
             return;
         }
@@ -70,6 +70,6 @@ public class InfiniteTrackRandom : MonoBehaviour
         Transform newSeg = SpawnRandomSegment(newLocalPos);
         segments.Add(newSeg);
 
-        Destroy(first.gameObject, 20f);
+        Destroy(first.gameObject, 1f);
     }
 }
