@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 3dc73d3ea753b6b428a3e05d33ec3a9f
+timeCreated: 1609622172
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186097
+  packageName: Snowboard Game Starter Pack (Template)
+  packageVersion: 0.4
+  assetPath: Assets/LapinerTools/SnowboardStarterKit/Models/Environment/SnowyPineTree/SnowyPineTree_SnowyLeaves.mat
+  uploadId: 418368

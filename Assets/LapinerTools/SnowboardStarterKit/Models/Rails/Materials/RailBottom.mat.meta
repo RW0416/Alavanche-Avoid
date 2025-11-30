@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 041bc67049e8dd24a83dfae994cc9379
+timeCreated: 1428939228
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186097
+  packageName: Snowboard Game Starter Pack (Template)
+  packageVersion: 0.4
+  assetPath: Assets/LapinerTools/SnowboardStarterKit/Models/Rails/Materials/RailBottom.mat
+  uploadId: 418368

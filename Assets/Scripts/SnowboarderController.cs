@@ -13,19 +13,20 @@ public class SnowboarderController : MonoBehaviour
     public float stickToGroundGravity = 40f;
     public float airGravity = 30f;
 
-    [Header("ground movement (feel)")]
+    [Header("ground movement")]
     public bool alwaysAccelerate = true;
     public float pushAcceleration = 12f;
     public float maxSpeed = 35f;
-    [Tooltip("base sideways friction, smaller = more slide")]
     public float baseGroundFriction = 5f;
-    [Tooltip("extra friction while turning")]
     public float carveExtraFriction = 8f;
-    [Tooltip("extra friction while braking")]
     public float brakeExtraFriction = 16f;
-    public float brakeStrength = 18f;
 
-    [Header("turn / carve")]
+    [Header("brake / boost")]
+    public float brakeStrength = 18f;
+    public float boostAcceleration = 20f;
+    public float boostMaxSpeedMultiplier = 1.2f;
+
+    [Header("turning / carving")]
     public float turnSpeed = 90f;
     public float bodyAlignLerp = 8f;
 
@@ -36,22 +37,26 @@ public class SnowboarderController : MonoBehaviour
 
     Rigidbody rb;
 
+    // input
     Vector2 moveInput;
     float horizontalInput;
     float verticalInput;
+    bool boostHeld;
 
+    // ground state
     bool isGrounded;
     bool wasGrounded;
     Vector3 groundNormal = Vector3.up;
     Vector3 smoothGroundNormal = Vector3.up;
 
+    // jump
     bool jumpRequested;
     bool hasJumpedSinceGrounded;
 
-    // like old BordDirection
+    // board direction (for carving)
     Vector3 rideDirection = Vector3.forward;
 
-    // public api for tricks etc
+    // public for other scripts
     public bool IsGrounded => isGrounded;
     public bool WasGrounded => wasGrounded;
     public Vector3 GroundNormal => groundNormal;
@@ -59,33 +64,41 @@ public class SnowboarderController : MonoBehaviour
     public float HorizontalInput => horizontalInput;
     public float VerticalInput => verticalInput;
     public Rigidbody Body => rb;
+    public bool IsBraking { get; private set; }
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.interpolation = RigidbodyInterpolation.Interpolate;
-        rb.useGravity = false; // we handle gravity
+        rb.useGravity = false;
         rb.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 
-        // let our own code control slide, keep this low
         rb.linearDamping = 0.0f;
         rb.angularDamping = 0.05f;
 
         rideDirection = transform.forward;
     }
 
-    // input from new input system
+    // called from PlayerInput (Move action)
     public void OnMove(InputAction.CallbackContext context)
     {
         moveInput = context.ReadValue<Vector2>();
     }
 
+    // called from PlayerInput (Jump action)
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.started)
-        {
             jumpRequested = true;
-        }
+    }
+
+    // called from PlayerInput (Boost action, e.g. left shift)
+    public void OnBoost(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+            boostHeld = true;
+        else if (context.canceled)
+            boostHeld = false;
     }
 
     void Update()
@@ -117,7 +130,7 @@ public class SnowboarderController : MonoBehaviour
             groundNormal = Vector3.up;
 
         Collider col = GetComponent<Collider>();
-        float castDistance = col ? col.bounds.extents.y + 0.5f : 1.5f;
+        float castDistance = col ? col.bounds.extents.y + groundCheckDistance : 1.5f;
 
         Vector3 origin = transform.position + Vector3.up * 0.2f;
         RaycastHit hit;
@@ -164,13 +177,12 @@ public class SnowboarderController : MonoBehaviour
     void ApplyGroundMovement()
     {
         Vector3 vel = rb.linearVelocity;
-
-        // velocity on slope plane
         Vector3 slopeNormal = smoothGroundNormal;
+
         Vector3 velOnPlane = Vector3.ProjectOnPlane(vel, slopeNormal);
         float planeSpeed = velOnPlane.magnitude;
 
-        // keep a board direction similar to old BordDirection
+        // keep a stable board direction
         if (planeSpeed > 0.5f)
         {
             rideDirection = velOnPlane.normalized;
@@ -182,10 +194,11 @@ public class SnowboarderController : MonoBehaviour
                 rideDirection = Vector3.ProjectOnPlane(transform.forward, slopeNormal).normalized;
         }
 
-        bool isBraking = verticalInput < -0.1f;
+        bool braking = verticalInput < -0.1f && planeSpeed > 0.1f;
+        IsBraking = braking;
 
-        // turn by rotating around slope normal (can’t steer while braking)
-        if (!isBraking && Mathf.Abs(horizontalInput) > 0.01f && planeSpeed > 0.1f)
+        // turn around slope normal (no steer while braking)
+        if (!braking && Mathf.Abs(horizontalInput) > 0.01f && planeSpeed > 0.1f)
         {
             float turnAngle = horizontalInput * turnSpeed * Time.fixedDeltaTime;
             Quaternion turnRot = Quaternion.AngleAxis(turnAngle, slopeNormal);
@@ -193,7 +206,6 @@ public class SnowboarderController : MonoBehaviour
             velOnPlane = turnRot * velOnPlane;
         }
 
-        // basis along board and sideways
         Vector3 forwardTangent = rideDirection;
         Vector3 rightTangent = Vector3.Cross(slopeNormal, forwardTangent).normalized;
 
@@ -201,11 +213,11 @@ public class SnowboarderController : MonoBehaviour
         float sideSpeed = Vector3.Dot(velOnPlane, rightTangent);
         float normalSpeed = Vector3.Dot(vel, slopeNormal);
 
-        // sideways friction (slide vs carve)
+        // sideways friction
         float lateralFriction = baseGroundFriction;
         if (Mathf.Abs(horizontalInput) > 0.1f)
             lateralFriction += carveExtraFriction;
-        if (isBraking)
+        if (braking)
             lateralFriction += brakeExtraFriction;
 
         float sideSign = Mathf.Sign(sideSpeed);
@@ -217,20 +229,24 @@ public class SnowboarderController : MonoBehaviour
         else
             sideSpeed -= sideSign * maxSideLoss;
 
-        // small forward drag so you don’t accelerate forever
+        // small forward drag
         float forwardDrag = 0.5f * baseGroundFriction * Time.fixedDeltaTime;
-        if (forwardSpeed > 0)
+        if (forwardSpeed > 0f)
             forwardSpeed = Mathf.Max(0f, forwardSpeed - forwardDrag);
-        else if (forwardSpeed < 0)
+        else if (forwardSpeed < 0f)
             forwardSpeed = Mathf.Min(0f, forwardSpeed + forwardDrag);
 
-        // acceleration along board dir
-        bool wantsAccelerate = alwaysAccelerate ? !isBraking : verticalInput > 0.1f;
+        // auto push down the hill
+        bool wantsAccelerate = alwaysAccelerate ? !braking : verticalInput > 0.1f;
         if (wantsAccelerate)
             forwardSpeed += pushAcceleration * Time.fixedDeltaTime;
 
-        // active brake
-        if (isBraking)
+        // boost (shift)
+        if (boostHeld && !braking)
+            forwardSpeed += boostAcceleration * Time.fixedDeltaTime;
+
+        // active brake (s)
+        if (braking)
         {
             float brakeAmount = brakeStrength * Time.fixedDeltaTime;
             if (Mathf.Abs(forwardSpeed) <= brakeAmount)
@@ -239,12 +255,11 @@ public class SnowboarderController : MonoBehaviour
                 forwardSpeed -= Mathf.Sign(forwardSpeed) * brakeAmount;
         }
 
-        // rebuild velocity
         Vector3 newVelOnPlane = forwardTangent * forwardSpeed + rightTangent * sideSpeed;
         Vector3 newVel = newVelOnPlane + slopeNormal * normalSpeed;
         rb.linearVelocity = newVel;
 
-        // orient body to board direction + slope
+        // rotate body to board + slope
         Quaternion targetRot = Quaternion.LookRotation(forwardTangent, slopeNormal);
         transform.rotation = Quaternion.Slerp(
             transform.rotation,
@@ -273,9 +288,8 @@ public class SnowboarderController : MonoBehaviour
 
         hasJumpedSinceGrounded = true;
 
-        // flatten vertical so jump height is consistent
         Vector3 vel = rb.linearVelocity;
-        vel.y = 0;
+        vel = Vector3.ProjectOnPlane(vel, groundNormal);
         rb.linearVelocity = vel;
 
         Vector3 jumpDir = (Vector3.up + groundNormal).normalized;
@@ -284,11 +298,11 @@ public class SnowboarderController : MonoBehaviour
 
     void ClampMaxSpeed()
     {
+        float currentMax = maxSpeed * (boostHeld ? boostMaxSpeedMultiplier : 1f);
         Vector3 vel = rb.linearVelocity;
         float speed = vel.magnitude;
-        if (speed > maxSpeed)
-        {
-            rb.linearVelocity = vel * (maxSpeed / speed);
-        }
+
+        if (speed > currentMax)
+            rb.linearVelocity = vel * (currentMax / speed);
     }
 }

@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: d1eff7d119966284ea1f3c543b5cdc8f
+timeCreated: 1579034240
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186097
+  packageName: Snowboard Game Starter Pack (Template)
+  packageVersion: 0.4
+  assetPath: Assets/LapinerTools/SnowboardStarterKit/Models/SharedMaterials/FinishFlagMaterial.mat
+  uploadId: 418368

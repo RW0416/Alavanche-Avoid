@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 34fa4ec3650cbb341b3e148f07962977
+timeCreated: 1579034240
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186097
+  packageName: Snowboard Game Starter Pack (Template)
+  packageVersion: 0.4
+  assetPath: Assets/LapinerTools/SnowboardStarterKit/Models/SharedMaterials/ColorBlueMaterial.mat
+  uploadId: 418368

@@ -5646,6 +5646,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 95266412242635172, guid: 40290f336ccbb6644ac5ebf86b4522fe, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 137557311296704928, guid: 40290f336ccbb6644ac5ebf86b4522fe, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -5794,6 +5798,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 37ba3269-c5d4-47b9-bf25-2927ab2ccdaa
     m_ActionName: 'Gameplay/Jump[/Keyboard/space]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 850068206}
+        m_TargetAssemblyTypeName: SnowboarderController, Assembly-CSharp
+        m_MethodName: OnBoost
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 1cfdc193-c063-4873-bfa7-10aae04212a7
+    m_ActionName: 'Gameplay/Boost[/Keyboard/leftShift]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
@@ -5817,15 +5837,19 @@ MonoBehaviour:
     m_Bits: 8
   slopeGravity: 25
   stickToGroundGravity: 10
+  airGravity: 30
+  alwaysAccelerate: 1
   pushAcceleration: 10
   maxSpeed: 30
   baseGroundFriction: 0.6
   carveExtraFriction: 0.4
+  brakeStrength: 30
   brakeExtraFriction: 2
-  brakeStrength: 18
+  boostAcceleration: 50
+  boostMaxSpeedMultiplier: 1.2
   turnSpeed: 90
-  carveAcceleration: 6
   bodyAlignLerp: 10
+  airTurnSpeed: 2
   jumpForce: 10
   groundCheckDistance: 0.4
 --- !u!54 &850068207
@@ -5836,7 +5860,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 850068202}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 80
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -5868,6 +5892,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SnowboarderTricks
   controller: {fileID: 850068206}
+  modelRotationOffset: -90
   maxTurnYaw: 25
   leanLerp: 10
   flipSpeed: 360

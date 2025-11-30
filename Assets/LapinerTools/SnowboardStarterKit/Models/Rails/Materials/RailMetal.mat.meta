@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 348cd0f041ceb624c8afc07c4199737b
+timeCreated: 1428939214
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 186097
+  packageName: Snowboard Game Starter Pack (Template)
+  packageVersion: 0.4
+  assetPath: Assets/LapinerTools/SnowboardStarterKit/Models/Rails/Materials/RailMetal.mat
+  uploadId: 418368
