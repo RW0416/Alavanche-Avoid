@@ -5843,14 +5843,14 @@ MonoBehaviour:
   maxSpeed: 30
   baseGroundFriction: 0.6
   carveExtraFriction: 0.4
-  brakeStrength: 30
   brakeExtraFriction: 2
+  brakeStrength: 30
   boostAcceleration: 50
   boostMaxSpeedMultiplier: 1.2
   turnSpeed: 90
   bodyAlignLerp: 10
   airTurnSpeed: 2
-  jumpForce: 10
+  jumpForce: 30
   groundCheckDistance: 0.4
 --- !u!54 &850068207
 Rigidbody:
@@ -5898,6 +5898,8 @@ MonoBehaviour:
   flipSpeed: 360
   spinSpeed: 360
   uprightRecoverySpeed: 540
+  brakeYawAngle: 90
+  brakePoseLerp: 10
 --- !u!114 &850068210
 MonoBehaviour:
   m_ObjectHideFlags: 0

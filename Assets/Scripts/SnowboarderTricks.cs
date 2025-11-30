@@ -10,13 +10,14 @@ public class SnowboarderTricks : MonoBehaviour
     [Tooltip("rotate the character mesh 90 or -90 degrees so the board faces downhill")]
     public float modelRotationOffset = -90f;
 
-    [Header("visual turn / lean")]
-    public float maxTurnYaw = 35f;
-    public float leanLerp = 15f;
+    [Header("visual turn / lean (no yaw)")]
+    [Tooltip("how much the rider leans when turning left/right")]
+    public float maxTurnYaw = 25f;        // lean angle
+    public float leanLerp = 15f;          // general pose smoothing
 
     [Header("trick speeds")]
-    public float flipSpeed = 360f;
-    public float spinSpeed = 360f;
+    public float flipSpeed = 360f;        // degrees per second
+    public float spinSpeed = 360f;        // degrees per second
 
     [Header("landing upright")]
     public float uprightRecoverySpeed = 720f;
@@ -24,31 +25,36 @@ public class SnowboarderTricks : MonoBehaviour
     [Header("brake pose")]
     [Tooltip("degrees to yaw the board sideways when braking")]
     public float brakeYawAngle = 90f;
+    [Tooltip("how fast to blend in/out the brake yaw")]
     public float brakePoseLerp = 10f;
+    [Tooltip("extra lean angle (deg) when braking, independent of turn input")]
+    public float brakeBackLeanAngle = 20f;
 
     Transform visualRoot;
 
     // input
     Vector2 moveInput;
-    bool jumpHeld;
+    bool jumpHeld;          // only true when you press space in the air (for tricks)
 
-    // trick state
-    bool trickArmed;
+    // state
     bool inJump;
+    bool prevGrounded;
 
-    float flipAngle;
-    float spinAngle;
+    // braking state for stable pose
+    bool prevBraking;
+    float brakeSide = 1f;   // +1 = right, -1 = left
 
-    // scoring accumulators
+    // trick angles (local)
+    float flipAngle;        // front/back flip around local X
+    float spinAngle;        // side spin around local Y
+
+    // scoring accumulators (degrees)
     float frontFlipAccum;
     float backFlipAccum;
     float spinAccum;
 
     float lastFlipAngle;
     float lastSpinAngle;
-
-    bool prevGrounded;
-    Quaternion jumpBaseRot;
 
     float currentBrakeYaw;
 
@@ -71,20 +77,22 @@ public class SnowboarderTricks : MonoBehaviour
         moveInput = context.ReadValue<Vector2>();
     }
 
-    // from PlayerInput (Jump)
+    // from PlayerInput (Jump) – ONLY for tricks now
+    // first space press (on ground) is handled by SnowboarderController
+    // pressing space again in the air arms tricks
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.started)
         {
-            jumpHeld = true;
-
+            // only start tricks if we're already in the air
             if (inJump && !controller.IsGrounded)
-                trickArmed = true;
+            {
+                jumpHeld = true;
+            }
         }
         else if (context.canceled)
         {
             jumpHeld = false;
-            trickArmed = false;
         }
     }
 
@@ -95,130 +103,171 @@ public class SnowboarderTricks : MonoBehaviour
 
         float dt = Time.deltaTime;
         bool grounded = controller.IsGrounded;
-        bool justLanded = grounded && !prevGrounded;
         bool justLeftGround = !grounded && prevGrounded;
+        bool justLanded = grounded && !prevGrounded;
+        bool braking = grounded && controller.IsBraking;
 
-        // transitions
+        // --- brake start / end: lock a stable side ---
+        if (braking && !prevBraking)
+        {
+            // when S is first pressed, decide which side to face ONCE
+            // if you're holding D, use that side, otherwise default to right
+            if (Mathf.Abs(moveInput.x) > 0.1f)
+                brakeSide = Mathf.Sign(moveInput.x);
+            else
+                brakeSide = 1f;   // default to "S + D" look
+        }
+        if (!braking && prevBraking)
+        {
+            // brake ended; yaw will blend back to 0
+        }
+        prevBraking = braking;
+
+        // --- jump transitions ---
         if (justLeftGround)
         {
             inJump = true;
-            trickArmed = false;
+
+            // tricks only start on another space press in air
+            jumpHeld = false;
 
             flipAngle = 0f;
             spinAngle = 0f;
+
             frontFlipAccum = 0f;
             backFlipAccum = 0f;
             spinAccum = 0f;
+
             lastFlipAngle = 0f;
             lastSpinAngle = 0f;
-
-            // store base rotation for trick axes
-            jumpBaseRot = controller.transform.rotation;
         }
 
         if (justLanded)
         {
             inJump = false;
-            trickArmed = false;
-
-            // clamp crazy values to avoid snap spins
-            flipAngle %= 360f;
-            spinAngle %= 360f;
-
-            if (flipAngle > 180f) flipAngle -= 360f;
-            if (flipAngle < -180f) flipAngle += 360f;
-            if (spinAngle > 180f) spinAngle -= 360f;
-            if (spinAngle < -180f) spinAngle += 360f;
+            jumpHeld = false;
         }
 
-        // air tricks
-        if (!grounded && inJump && trickArmed && jumpHeld)
+        // --- trick control in air ---
+        if (inJump && !grounded && jumpHeld)
         {
             float h = moveInput.x;
             float v = moveInput.y;
-            bool wantFlip = Mathf.Abs(v) > 0.1f;
-            bool wantSpin = Mathf.Abs(h) > 0.1f;
 
-            // prefer spin if both pressed
-            if (wantSpin)
+            bool wantSpin = Mathf.Abs(h) > 0.25f;
+            bool wantFlip = Mathf.Abs(v) > 0.25f;
+
+            // prefer spin if stronger sideways input
+            if (wantSpin && Mathf.Abs(h) >= Mathf.Abs(v))
             {
+                // side spins (around local Y)
                 spinAngle += spinSpeed * h * dt;
             }
             else if (wantFlip)
             {
-                // pull back = backflip, push forward = frontflip
-                if (v > 0.1f) flipAngle += flipSpeed * dt;
-                else flipAngle -= flipSpeed * dt;
+                // front/back flips (around local X)
+                // v > 0 = frontflip, v < 0 = backflip
+                flipAngle += flipSpeed * v * dt;
             }
         }
 
-        // scoring
-        if (!grounded && inJump)
+        // --- scoring while in air ---
+        if (inJump && !grounded)
         {
             float deltaFlip = flipAngle - lastFlipAngle;
             float deltaSpin = spinAngle - lastSpinAngle;
 
-            if (deltaFlip > 0f) frontFlipAccum += deltaFlip;
-            else backFlipAccum += -deltaFlip;
+            if (deltaFlip > 0f)
+                frontFlipAccum += deltaFlip;
+            else
+                backFlipAccum += -deltaFlip;
 
             spinAccum += Mathf.Abs(deltaSpin);
 
-            while (frontFlipAccum >= 360f) { frontFlipAccum -= 360f; AwardScore(15); }
-            while (backFlipAccum  >= 360f) { backFlipAccum  -= 360f; AwardScore(10); }
-            while (spinAccum      >= 360f) { spinAccum      -= 360f; AwardScore(5);  }
+            if (frontFlipAccum >= 360f)
+            {
+                int count = Mathf.FloorToInt(frontFlipAccum / 360f);
+                frontFlipAccum -= 360f * count;
+                AwardScore(15 * count);
+            }
+
+            if (backFlipAccum >= 360f)
+            {
+                int count = Mathf.FloorToInt(backFlipAccum / 360f);
+                backFlipAccum -= 360f * count;
+                AwardScore(10 * count);
+            }
+
+            if (spinAccum >= 360f)
+            {
+                int count = Mathf.FloorToInt(spinAccum / 360f);
+                spinAccum -= 360f * count;
+                AwardScore(5 * count);
+            }
 
             lastFlipAngle = flipAngle;
             lastSpinAngle = spinAngle;
         }
 
-        // landing recovery
-        if (grounded)
+        // --- recover upright when on ground ---
+        if (grounded && !inJump)
         {
             flipAngle = Mathf.MoveTowardsAngle(flipAngle, 0f, uprightRecoverySpeed * dt);
             spinAngle = Mathf.MoveTowardsAngle(spinAngle, 0f, uprightRecoverySpeed * dt);
+
+            lastFlipAngle = flipAngle;
+            lastSpinAngle = spinAngle;
         }
 
         prevGrounded = grounded;
-        UpdateVisualRotation(dt);
+
+        UpdateVisualRotation(dt, grounded, braking);
     }
 
-    void UpdateVisualRotation(float dt)
+    void UpdateVisualRotation(float dt, bool grounded, bool braking)
     {
-        // base physics rotation
         Quaternion baseRot = controller.transform.rotation;
 
-        // trick axes
-        Quaternion trickRefRot = inJump ? jumpBaseRot : baseRot;
-        Vector3 trickRight = trickRefRot * Vector3.right;
-        Vector3 trickUp = trickRefRot * Vector3.up;
-
-        // turn lean from input (only when not tricking)
-        float turnYaw = (controller.IsGrounded && !inJump) ? moveInput.x * maxTurnYaw : 0f;
-        Quaternion turnRot = Quaternion.AngleAxis(turnYaw, baseRot * Vector3.up);
-
-        // brake pose – yaw board sideways when braking
-        float targetBrakeYaw = 0f;
-        if (controller.IsGrounded && controller.IsBraking)
+        // 1) turn lean: only when NOT braking
+        float targetLean = 0f;
+        if (grounded && !inJump && !braking)
         {
-            // decide which way to point; use input if there is any, else default to left
-            float side = Mathf.Abs(moveInput.x) > 0.1f ? Mathf.Sign(moveInput.x) : 1f;
-            targetBrakeYaw = brakeYawAngle * side;
+            // regular carve lean (A/D)
+            targetLean = -moveInput.x * maxTurnYaw;
+        }
+        else if (grounded && braking)
+        {
+            // separate brake lean – constant "back" lean
+            targetLean = -brakeBackLeanAngle;
+        }
+        Quaternion leanRot = Quaternion.AngleAxis(targetLean, Vector3.forward);
+
+        // 2) brake pose yaw – fixed side while braking, independent of A/D once locked
+        float targetBrakeYaw = 0f;
+        if (grounded && braking)
+        {
+            targetBrakeYaw = brakeYawAngle * brakeSide;
         }
 
         currentBrakeYaw = Mathf.Lerp(currentBrakeYaw, targetBrakeYaw, brakePoseLerp * dt);
-        Vector3 upAxis = baseRot * Vector3.up;
-        Quaternion brakeRot = Quaternion.AngleAxis(currentBrakeYaw, upAxis);
+        Quaternion brakeRot = Quaternion.AngleAxis(currentBrakeYaw, Vector3.up);
 
-        // trick rotations
-        Quaternion flipRot = Quaternion.AngleAxis(flipAngle, trickRight);
-        Quaternion spinRot = Quaternion.AngleAxis(spinAngle, trickUp);
+        // 3) trick rotations (local)
+        Quaternion flipRot = Quaternion.AngleAxis(flipAngle, Vector3.right);
+        Quaternion spinRot = Quaternion.AngleAxis(spinAngle, Vector3.up);
+        Quaternion trickRot = spinRot * flipRot;
 
-        // mesh orientation offset
+        // 4) mesh orientation fix
         Quaternion offsetRot = Quaternion.Euler(0f, modelRotationOffset, 0f);
 
-        // final
-        Quaternion finalRot = baseRot * brakeRot * turnRot * spinRot * flipRot * offsetRot;
-        visualRoot.rotation = Quaternion.Slerp(visualRoot.rotation, finalRot, leanLerp * dt);
+        // final rotation: physics → brake → lean → tricks → mesh offset
+        Quaternion targetRot = baseRot * brakeRot * leanRot * trickRot * offsetRot;
+
+        visualRoot.rotation = Quaternion.Slerp(
+            visualRoot.rotation,
+            targetRot,
+            leanLerp * dt
+        );
     }
 
     void AwardScore(int amount)

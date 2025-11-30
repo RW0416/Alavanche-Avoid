@@ -270,10 +270,6 @@ public class SnowboarderController : MonoBehaviour
 
     void ApplyAirMovement()
     {
-        if (Mathf.Abs(horizontalInput) > 0.1f)
-        {
-            rb.AddTorque(Vector3.up * horizontalInput * airTurnSpeed, ForceMode.Acceleration);
-        }
     }
 
     void HandleJump()
@@ -288,6 +284,10 @@ public class SnowboarderController : MonoBehaviour
 
         hasJumpedSinceGrounded = true;
 
+        // stop any rotation from carrying into the air
+        rb.angularVelocity = Vector3.zero;
+
+        // keep only the velocity along the slope when we jump
         Vector3 vel = rb.linearVelocity;
         vel = Vector3.ProjectOnPlane(vel, groundNormal);
         rb.linearVelocity = vel;
@@ -295,6 +295,7 @@ public class SnowboarderController : MonoBehaviour
         Vector3 jumpDir = (Vector3.up + groundNormal).normalized;
         rb.AddForce(jumpDir * jumpForce, ForceMode.VelocityChange);
     }
+
 
     void ClampMaxSpeed()
     {
