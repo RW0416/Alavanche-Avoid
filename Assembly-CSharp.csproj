@@ -61,6 +61,7 @@
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerMovement.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SquareBanding.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerReset.cs" />
+    <Compile Include="Assets\Scripts\SnowboarderAnimationBridge.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_InputSystemSwitcher.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
