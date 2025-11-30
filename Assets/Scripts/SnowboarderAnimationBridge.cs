@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Animator))]
 public class SnowboarderAnimationBridge : MonoBehaviour
@@ -7,8 +8,8 @@ public class SnowboarderAnimationBridge : MonoBehaviour
     public SnowboarderTricks tricks;
 
     [Header("Bomb / Grab Settings")]
-    [Tooltip("Relative speed (0–1) at which we switch to the Bomb pose.")]
-    [Range(0f, 1f)] public float bombSpeedThreshold = 0.8f;
+    [Tooltip("Relative speed (0–1) at which we switch to the Bomb pose when boosting.")]
+    [Range(0f, 1f)] public float bombSpeedThreshold = 0.4f;
 
     Animator anim;
 
@@ -54,6 +55,9 @@ public class SnowboarderAnimationBridge : MonoBehaviour
         bool doingTrick = tricks != null && tricks.IsDoingTrick;
         bool flatSpin   = tricks != null && tricks.IsFlatSpinTrick;
 
+        // read boost directly from keyboard (Left Shift)
+        bool boostHeld = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+
         int pose;
 
         if (inAir)
@@ -86,8 +90,8 @@ public class SnowboarderAnimationBridge : MonoBehaviour
             }
             else
             {
-                // bombing = fast, on ground, not braking
-                bool isBomb = !braking && relSpeed >= bombSpeedThreshold;
+                // bombing ONLY when actively boosting with Shift AND moving fast enough
+                bool isBomb = boostHeld && !braking && relSpeed >= bombSpeedThreshold;
 
                 if (isBomb)
                     pose = (int)Pose.Bomb;

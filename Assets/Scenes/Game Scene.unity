@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: 0ff3aa777f2ccae4dbada9366130d56b, type: 2}
+  m_SkyboxMaterial: {fileID: 2100000, guid: b7b81ebbe36017a489fa9efb826111de, type: 2}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -5737,12 +5737,12 @@ MonoBehaviour:
   pushAcceleration: 10
   maxSpeed: 30
   baseGroundFriction: 0.6
-  carveExtraFriction: 0.4
+  carveExtraFriction: 1
   brakeExtraFriction: 2
   brakeStrength: 30
   boostAcceleration: 50
   boostMaxSpeedMultiplier: 1.2
-  turnSpeed: 90
+  turnSpeed: 50
   bodyAlignLerp: 10
   airTurnSpeed: 2
   jumpForce: 30
@@ -5793,9 +5793,14 @@ MonoBehaviour:
   flipSpeed: 360
   spinSpeed: 360
   uprightRecoverySpeed: 540
+  uprightOnSlopeLerp: 10
   brakeYawAngle: 90
   brakePoseLerp: 10
   brakeBackLeanAngle: 20
+  rotationScoreThreshold: 0.7
+  frontFlipScore: 10
+  backFlipScore: 15
+  spinScore: 5
 --- !u!114 &850068210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13212,6 +13217,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SnowboarderAnimationBridge
   controller: {fileID: 850068206}
+  tricks: {fileID: 0}
+  bombSpeedThreshold: 0.4
 --- !u!95 &137557311608722251
 Animator:
   serializedVersion: 7
