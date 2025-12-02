@@ -52,6 +52,8 @@ public class SnowboarderController : MonoBehaviour
 
     Rigidbody rb;
 
+    public ThirdPersonCamera tpCamera;
+
     // input
     Vector2 moveInput;
     float horizontalInput;
@@ -373,6 +375,12 @@ public class SnowboarderController : MonoBehaviour
         }
 
         Destroy(obstacle.gameObject);
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        if (tpCamera != null)
+            tpCamera.OnLook(context);
     }
 
 }

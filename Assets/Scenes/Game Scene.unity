@@ -473,12 +473,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216229366}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 50, z: 70}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 330585546}
+  m_Father: {fileID: 4615519780005885}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!199 &216229368
 ParticleSystemRenderer:
@@ -1131,7 +1131,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 20000
+    maxNumParticles: 5000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -1199,7 +1199,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 80, y: 1, z: 30}
+    m_Scale: {x: 100, y: 400, z: 30}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -1397,7 +1397,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 600
+      scalar: 200
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -5295,7 +5295,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
-  - component: {fileID: 330585548}
+  - component: {fileID: 330585549}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -5371,11 +5371,10 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 58, z: 220}
+  m_LocalPosition: {x: 0, y: 80, z: 280}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 216229367}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
@@ -5422,7 +5421,7 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &330585548
+--- !u!114 &330585549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5431,13 +5430,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a221643a7338174c8b5f2bfc716b72c, type: 3}
+  m_Script: {fileID: 11500000, guid: b624171db61b508489fbdc030256d9d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FollowBall
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
   target: {fileID: 4615519780005885}
-  offset: {x: 0, y: 8, z: 6}
-  followSpeed: 5
-  lookSpeed: 10
+  distance: 15
+  heightOffset: 1.5
+  sensitivity: {x: 0.1, y: 0.1}
+  minPitch: -30
+  maxPitch: 70
+  smoothTime: 0.05
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &403209301
 GameObject:
   m_ObjectHideFlags: 0
@@ -6103,6 +6108,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1cfdc193-c063-4873-bfa7-10aae04212a7
     m_ActionName: 'Gameplay/Boost[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 850068206}
+        m_TargetAssemblyTypeName: SnowboarderController, Assembly-CSharp
+        m_MethodName: OnLook
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: cb1a84e0-f04c-42ca-ac7c-45e9f3e907ca
+    m_ActionName: 'Gameplay/Look[/Mouse/delta]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
@@ -6147,6 +6168,7 @@ MonoBehaviour:
   hitEffectPrefab: {fileID: 4534809420507962529, guid: ee2c96cee13a277459367954a9f87b06, type: 3}
   hitEffectLifetime: 3
   hitCooldown: 0.3
+  tpCamera: {fileID: 330585549}
 --- !u!54 &850068207
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13704,6 +13726,7 @@ Transform:
   - {fileID: 1927183641}
   - {fileID: 4044723430746739}
   - {fileID: 403209302}
+  - {fileID: 216229367}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4618656401309811
