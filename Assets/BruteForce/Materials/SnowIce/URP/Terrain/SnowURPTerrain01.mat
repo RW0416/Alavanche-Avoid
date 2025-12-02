@@ -13,6 +13,7 @@ Material:
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
   - IS_T
+  - IS_UNLIT
   - USE_AL
   - USE_FOG
   - USE_LS
@@ -289,7 +290,7 @@ Material:
     - _ISICE: 0
     - _ISSNOW: 0
     - _IST: 1
-    - _ISUNLIT: 0
+    - _ISUNLIT: 1
     - _IceScale: 1
     - _IndentDepth: 0.25
     - _IndentStrength: 1.5
