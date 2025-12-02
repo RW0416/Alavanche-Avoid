@@ -284,7 +284,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1516549552}
   m_Father: {fileID: 1746827878}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &197296212
@@ -472,12 +473,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216229366}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 20, z: 70}
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
-  m_Father: {fileID: 330585546}
+  m_Father: {fileID: 4615519780005885}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!199 &216229368
 ParticleSystemRenderer:
@@ -1130,7 +1131,7 @@ ParticleSystem:
         m_RotationOrder: 4
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 20000
+    maxNumParticles: 5000
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
     rotation3D: 0
@@ -1198,7 +1199,7 @@ ParticleSystem:
     donutRadius: 0.2
     m_Position: {x: 0, y: 0, z: 0}
     m_Rotation: {x: 0, y: 0, z: 0}
-    m_Scale: {x: 80, y: 1, z: 30}
+    m_Scale: {x: 100, y: 400, z: 30}
     placementMode: 0
     m_MeshMaterialIndex: 0
     m_MeshNormalOffset: 0
@@ -1396,7 +1397,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 600
+      scalar: 200
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -5294,7 +5295,7 @@ GameObject:
   - component: {fileID: 330585545}
   - component: {fileID: 330585544}
   - component: {fileID: 330585547}
-  - component: {fileID: 330585548}
+  - component: {fileID: 330585549}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -5370,11 +5371,10 @@ Transform:
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 58, z: 220}
+  m_LocalPosition: {x: 0, y: 80, z: 280}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 216229367}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
@@ -5421,7 +5421,7 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!114 &330585548
+--- !u!114 &330585549
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5430,13 +5430,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 330585543}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a221643a7338174c8b5f2bfc716b72c, type: 3}
+  m_Script: {fileID: 11500000, guid: b624171db61b508489fbdc030256d9d0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FollowBall
+  m_EditorClassIdentifier: Assembly-CSharp::ThirdPersonCamera
   target: {fileID: 4615519780005885}
-  offset: {x: 0, y: 8, z: 6}
-  followSpeed: 5
-  lookSpeed: 10
+  distance: 15
+  heightOffset: 1.5
+  sensitivity: {x: 0.1, y: 0.1}
+  minPitch: -30
+  maxPitch: 70
+  smoothTime: 0.05
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!1 &403209301
 GameObject:
   m_ObjectHideFlags: 0
@@ -6102,6 +6108,22 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1cfdc193-c063-4873-bfa7-10aae04212a7
     m_ActionName: 'Gameplay/Boost[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 850068206}
+        m_TargetAssemblyTypeName: SnowboarderController, Assembly-CSharp
+        m_MethodName: OnLook
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: cb1a84e0-f04c-42ca-ac7c-45e9f3e907ca
+    m_ActionName: 'Gameplay/Look[/Mouse/delta]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Gameplay
@@ -6141,6 +6163,12 @@ MonoBehaviour:
   airTurnSpeed: 2
   jumpForce: 30
   groundCheckDistance: 0.4
+  hitSlowFactor: 0.4
+  hitMinSpeedAfter: 5
+  hitEffectPrefab: {fileID: 4534809420507962529, guid: ee2c96cee13a277459367954a9f87b06, type: 3}
+  hitEffectLifetime: 3
+  hitCooldown: 0.3
+  tpCamera: {fileID: 330585549}
 --- !u!54 &850068207
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6241,7 +6269,7 @@ Transform:
   m_GameObject: {fileID: 1293736343}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 144.25, y: 31.029999, z: 1.8399789}
+  m_LocalPosition: {x: 144.25, y: 33, z: 1.8399789}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11420,6 +11448,95 @@ MonoBehaviour:
   scoreTarget: {fileID: 1560051047}
   scoreMultiplier: 0.5
   useFloatingText: 1
+--- !u!1 &1516549551
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1516549552}
+  - component: {fileID: 1516549554}
+  - component: {fileID: 1516549553}
+  m_Layer: 0
+  m_Name: Avalanche
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1516549552
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1516549551}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.000045755165, y: -0.945129, z: 0.3266976, w: -0.00013234722}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 300, y: 20, z: 100.00002}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 197296211}
+  m_LocalEulerAnglesHint: {x: 38.137, y: -180.02, z: -0.013}
+--- !u!23 &1516549553
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1516549551}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: df674d9ce8e762443ab267ade13999c7, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1516549554
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1516549551}
+  m_Mesh: {fileID: 4300000, guid: 26336c0d7e5a724469760c3d9c57e9cc, type: 2}
 --- !u!1 &1528024984
 GameObject:
   m_ObjectHideFlags: 0
@@ -11585,7 +11702,7 @@ Transform:
   m_GameObject: {fileID: 1541831287}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: -35.75, y: 31.029999, z: 1.84}
+  m_LocalPosition: {x: -35.75, y: 33, z: 1.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12181,7 +12298,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1746827878}
-  - component: {fileID: 1746827879}
   - component: {fileID: 1746827880}
   m_Layer: 0
   m_Name: Track_Root
@@ -12198,28 +12314,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1746827876}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.13052624, y: 0, z: 0, w: 0.9914449}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 197296211}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1746827879
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1746827876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96fc3cdbe9b2c644492814ec7a712af6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TrackSlope
-  slopeDegrees: 15
-  downhillAlongNegativeZ: 1
+  m_LocalEulerAnglesHint: {x: -15, y: 0, z: 0}
 --- !u!114 &1746827880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13624,6 +13726,7 @@ Transform:
   - {fileID: 1927183641}
   - {fileID: 4044723430746739}
   - {fileID: 403209302}
+  - {fileID: 216229367}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4618656401309811

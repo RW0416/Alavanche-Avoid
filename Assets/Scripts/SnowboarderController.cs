@@ -39,7 +39,20 @@ public class SnowboarderController : MonoBehaviour
     public float jumpForce = 8f;
     public float groundCheckDistance = 0.4f;
 
+    [Header("collision / hit")]
+    [Tooltip("speed * factor after hit")]
+    public float hitSlowFactor = 0.4f;
+    public float hitMinSpeedAfter = 5f;
+    public GameObject hitEffectPrefab;
+    public float hitEffectLifetime = 3f;
+    public float hitCooldown = 0.3f;
+
+    float lastHitTime = -999f;
+
+
     Rigidbody rb;
+
+    public ThirdPersonCamera tpCamera;
 
     // input
     Vector2 moveInput;
@@ -320,4 +333,54 @@ public class SnowboarderController : MonoBehaviour
         if (speed > currentMax)
             rb.linearVelocity = vel * (currentMax / speed);
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (!other.CompareTag("Obstacle"))
+            return;
+
+        if (Time.time < lastHitTime + hitCooldown)
+            return;
+
+        lastHitTime = Time.time;
+
+        HandleObstacleHit(other);
+    }
+
+    void HandleObstacleHit(Collider obstacle)
+    {
+        Vector3 vel = rb.linearVelocity;
+        float speed = vel.magnitude;
+
+        if (speed > 0.1f)
+        {
+            float newSpeed = Mathf.Max(speed * hitSlowFactor, hitMinSpeedAfter);
+            Vector3 newVel = vel.normalized * newSpeed;
+            rb.linearVelocity = newVel;
+        }
+
+        Vector3 hitPos = obstacle.ClosestPoint(transform.position);
+
+        if (hitEffectPrefab != null)
+        {
+            var fx = Instantiate(
+                hitEffectPrefab,
+                hitPos,
+                Quaternion.identity
+            );
+            if (hitEffectLifetime > 0f)
+            {
+                Destroy(fx, hitEffectLifetime);
+            }
+        }
+
+        Destroy(obstacle.gameObject);
+    }
+
+    public void OnLook(InputAction.CallbackContext context)
+    {
+        if (tpCamera != null)
+            tpCamera.OnLook(context);
+    }
+
 }

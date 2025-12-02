@@ -57,6 +57,7 @@ public class InfiniteTrackRandom : MonoBehaviour
         return seg;
     }
 
+
     void RecycleFirstSegment()
     {
         Transform last = segments[segments.Count - 1];
@@ -70,6 +71,6 @@ public class InfiniteTrackRandom : MonoBehaviour
         Transform newSeg = SpawnRandomSegment(newLocalPos);
         segments.Add(newSeg);
 
-        Destroy(first.gameObject, 1f);
+        Destroy(first.gameObject, 15f);
     }
 }
