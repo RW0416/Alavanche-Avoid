@@ -262,7 +262,7 @@ Material:
     - _DetailBumpScale: 3.07
     - _DetailNormalMapScale: 1
     - _DisplacementColorMult: 0.61
-    - _DisplacementOffset: 0.3
+    - _DisplacementOffset: -0.4
     - _DisplacementShadowMult: 1
     - _DisplacementStrength: 0.45
     - _DstBlend: 0
@@ -305,7 +305,7 @@ Material:
     - _Metallic7: 0
     - _Mode: 0
     - _NormalMultiplier: 0.125
-    - _NormalRTDepth: 0.18
+    - _NormalRTDepth: 0.185
     - _NormalRTStrength: 2.2
     - _NormalScale: 0.123
     - _NormalScale0: 1
