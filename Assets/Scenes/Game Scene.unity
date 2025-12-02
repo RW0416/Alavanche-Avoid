@@ -474,7 +474,7 @@ Transform:
   m_GameObject: {fileID: 216229366}
   serializedVersion: 2
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 20, z: 70}
+  m_LocalPosition: {x: 0, y: 50, z: 70}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -6142,6 +6142,11 @@ MonoBehaviour:
   airTurnSpeed: 2
   jumpForce: 30
   groundCheckDistance: 0.4
+  hitSlowFactor: 0.4
+  hitMinSpeedAfter: 5
+  hitEffectPrefab: {fileID: 4534809420507962529, guid: ee2c96cee13a277459367954a9f87b06, type: 3}
+  hitEffectLifetime: 3
+  hitCooldown: 0.3
 --- !u!54 &850068207
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6242,7 +6247,7 @@ Transform:
   m_GameObject: {fileID: 1293736343}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 144.25, y: 31.029999, z: 1.8399789}
+  m_LocalPosition: {x: 144.25, y: 33, z: 1.8399789}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -11433,7 +11438,7 @@ GameObject:
   - component: {fileID: 1516549554}
   - component: {fileID: 1516549553}
   m_Layer: 0
-  m_Name: SpherePoly
+  m_Name: Avalanche
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11675,7 +11680,7 @@ Transform:
   m_GameObject: {fileID: 1541831287}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: -35.75, y: 31.029999, z: 1.84}
+  m_LocalPosition: {x: -35.75, y: 33, z: 1.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -12271,7 +12276,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1746827878}
-  - component: {fileID: 1746827879}
   - component: {fileID: 1746827880}
   m_Layer: 0
   m_Name: Track_Root
@@ -12288,28 +12292,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1746827876}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.13052624, y: 0, z: 0, w: 0.9914449}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 197296211}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1746827879
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1746827876}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 96fc3cdbe9b2c644492814ec7a712af6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TrackSlope
-  slopeDegrees: 15
-  downhillAlongNegativeZ: 1
+  m_LocalEulerAnglesHint: {x: -15, y: 0, z: 0}
 --- !u!114 &1746827880
 MonoBehaviour:
   m_ObjectHideFlags: 0

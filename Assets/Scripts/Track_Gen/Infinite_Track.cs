@@ -57,6 +57,7 @@ public class InfiniteTrackRandom : MonoBehaviour
         return seg;
     }
 
+
     void RecycleFirstSegment()
     {
         Transform last = segments[segments.Count - 1];
