@@ -10942,19 +10942,13 @@ PrefabInstance:
       addedObject: {fileID: 1927183644}
     - targetCorrespondingSourceObject: {fileID: 1050939880527482, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1927183647}
-    - targetCorrespondingSourceObject: {fileID: 1050939880527482, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1927183649}
-    - targetCorrespondingSourceObject: {fileID: 1050939880527482, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1927183648}
-    - targetCorrespondingSourceObject: {fileID: 1050939880527482, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 1927183654}
     - targetCorrespondingSourceObject: {fileID: 1050939880527482, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1927183653}
+    - targetCorrespondingSourceObject: {fileID: 1050939880527482, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1927183655}
   m_SourcePrefab: {fileID: 100100000, guid: ff8491d701e14fa4d8988b32c6c7b193, type: 3}
 --- !u!1 &1475798073
 GameObject:
@@ -11363,53 +11357,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.34394875, y: 0.07872651, z: 1.7204803}
   m_Center: {x: -0.0000000037252903, y: 0, z: 0.000000044703498}
---- !u!114 &1927183647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927183640}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fdb2eaef288ad5743bc51c14ebd39cba, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SnowDeformer
-  brushRadius: 1
-  depressionAmount: 7
-  snowLayer:
-    serializedVersion: 2
-    m_Bits: 8
---- !u!114 &1927183648
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927183640}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fb1cf2caeea15a641a9b68e147daa302, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BF_PlayerSnow
-  playerCollider: {fileID: -4300437247712993182, guid: 3cd15cdd0df9f8f4b8382c7b98552c38, type: 3}
-  particleSys: {fileID: 216229369}
-  playerMatDefault: {fileID: 13400000, guid: bbd172ead790a1a43a763ae897779c7e, type: 2}
-  playerMatSnow: {fileID: 13400000, guid: a070e9ef90b216941808cf33c017197d, type: 2}
-  playerMatIce: {fileID: 13400000, guid: 672f836d4d8b17041a8cddfb76d71d7e, type: 2}
---- !u!114 &1927183649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1927183640}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0c540651fd7ade458bcf18adb77a455, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BF_PlayerMovement
-  cam: {fileID: 330585545}
 --- !u!114 &1927183653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11455,6 +11402,24 @@ ParentConstraint:
     weight: 0
   - sourceTransform: {fileID: 4263962078201825}
     weight: 1
+--- !u!114 &1927183655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1927183640}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 465b56a6d65ef4f4db5042640c6f7802, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SnowTrailToggle
+  snowParticle: {fileID: 1391432468}
+  groundCheckDist: 0.6
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  detectionPoint: {fileID: 1927183641}
 --- !u!1 &1001179582445493
 GameObject:
   m_ObjectHideFlags: 0
