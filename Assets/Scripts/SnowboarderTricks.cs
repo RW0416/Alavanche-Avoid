@@ -16,6 +16,9 @@ public class SnowboarderTricks : MonoBehaviour
     public float leanLerp = 15f;
 
     [Header("Trick Speeds")]
+    float baseFlipSpeed;
+    float baseSpinSpeed;
+
     public float flipSpeed = 360f;   // degrees per second, front/back
     public float spinSpeed = 360f;   // degrees per second, side spin
 
@@ -98,8 +101,22 @@ public class SnowboarderTricks : MonoBehaviour
         {
             Debug.LogError("SnowboarderTricks: visualRoot not set. Assign the mesh child in the controller.");
             enabled = false;
+            return;
+        }
+
+        // 记录基础值
+        baseFlipSpeed = flipSpeed;
+        baseSpinSpeed = spinSpeed;
+
+        // 应用升级
+        if (GameProgress.Instance != null)
+        {
+            float mul = GameProgress.Instance.GetTrickSpeedMultiplier();
+            flipSpeed = baseFlipSpeed * mul;
+            spinSpeed = baseSpinSpeed * mul;
         }
     }
+
 
     // from PlayerInput (Move)
     public void OnMove(InputAction.CallbackContext context)

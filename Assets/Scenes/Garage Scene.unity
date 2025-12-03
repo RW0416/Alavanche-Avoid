@@ -15595,6 +15595,26 @@ MonoBehaviour:
   tagsToSearch:
   - Player
   fadeSpeed: 12
+--- !u!114 &565012311
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 316862335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 372b8a19246282541b70577ea7b48367, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GarageUpgradeStation
+  upgradeType: 1
+  baseCost: 100
+  costPerLevel: 50
+  maxLevel: 5
+  interactRadius: 2.5
+  playerTag: Player
+  interactKey: 19
+  worldText: {fileID: 0}
 --- !u!1001 &566288972
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -23953,6 +23973,56 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 01d2dd5255c308a4db25dbb77d9f65ea, type: 3}
+--- !u!1 &713432666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 713432668}
+  - component: {fileID: 713432667}
+  m_Layer: 0
+  m_Name: GameProgress
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &713432667
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713432666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 791262e82a902964aa6758426918473b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameProgress
+  coins: 500
+  speedLevel: 0
+  trickSpeedLevel: 0
+  extraLifeLevel: 0
+  speedPerLevel: 0.1
+  trickSpeedPerLevel: 0.1
+--- !u!4 &713432668
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 713432666}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.59119, y: 1.24303, z: 2.29237}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &713716029 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000012197449570, guid: 01d2dd5255c308a4db25dbb77d9f65ea, type: 3}
@@ -35227,6 +35297,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1061666498410416, guid: 6f7a4a837178b3c4691988b5c5f39ee8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1142003201}
+    - targetCorrespondingSourceObject: {fileID: 1061666498410416, guid: 6f7a4a837178b3c4691988b5c5f39ee8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1142003202}
   m_SourcePrefab: {fileID: 100100000, guid: 6f7a4a837178b3c4691988b5c5f39ee8, type: 3}
 --- !u!1 &1142003196 stripped
 GameObject:
@@ -35284,6 +35357,26 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: e263cb9533718d44db83c29d67d259d2, type: 3}
+--- !u!114 &1142003202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142003196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 372b8a19246282541b70577ea7b48367, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GarageUpgradeStation
+  upgradeType: 0
+  baseCost: 100
+  costPerLevel: 50
+  maxLevel: 5
+  interactRadius: 2.5
+  playerTag: Player
+  interactKey: 19
+  worldText: {fileID: 0}
 --- !u!1 &1144894160 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1166047731958209889, guid: a8c8809ca91ff9e40888a9fb4b2d2c83, type: 3}
@@ -47974,51 +48067,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 78af3a7aad589fa49b8fb946c9e57362, type: 3}
---- !u!1 &1676161901
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1676161903}
-  - component: {fileID: 1676161902}
-  m_Layer: 0
-  m_Name: Coin_Manager_Global
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1676161902
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1676161901}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a14d27f29fb4dc40966528bb806b967, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CoinManager
-  totalCoins: 0
---- !u!4 &1676161903
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1676161901}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1676429707
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -49273,7 +49321,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -537, y: 266}
+  m_AnchoredPosition: {x: -401, y: 209}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1738077883
@@ -55646,6 +55694,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 419158241164844111, guid: bb7dde9fdc623d841b3d3d6aea6bffef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 565012308}
+    - targetCorrespondingSourceObject: {fileID: 419158241164844111, guid: bb7dde9fdc623d841b3d3d6aea6bffef, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 565012311}
     - targetCorrespondingSourceObject: {fileID: 419158242123669416, guid: bb7dde9fdc623d841b3d3d6aea6bffef, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1485941177}
@@ -64321,6 +64372,6 @@ SceneRoots:
   - {fileID: 307320353}
   - {fileID: 1975459435}
   - {fileID: 77456568}
-  - {fileID: 1676161903}
+  - {fileID: 713432668}
   - {fileID: 35442735}
   - {fileID: 933102542}

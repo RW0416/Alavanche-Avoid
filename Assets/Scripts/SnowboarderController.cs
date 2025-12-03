@@ -8,6 +8,11 @@ public class SnowboarderController : MonoBehaviour
     public Transform visualRoot;
     public LayerMask groundMask = ~0;
 
+    [Header("speed mod")]
+    float baseMaxSpeed;
+    float basePushAcceleration;
+    float baseBoostAcceleration;
+
     [Header("local gravity")]
     public float slopeGravity = 25f;
     public float stickToGroundGravity = 40f;
@@ -94,7 +99,28 @@ public class SnowboarderController : MonoBehaviour
         rb.angularDamping = 0.05f;
 
         rideDirection = transform.forward;
+
+        // === 记录基础值 ===
+        baseMaxSpeed = maxSpeed;
+        basePushAcceleration = pushAcceleration;
+        baseBoostAcceleration = boostAcceleration;
+
+        // === 应用升级（如果有） ===
+        ApplySpeedUpgrades();
     }
+
+    public void ApplySpeedUpgrades()
+    {
+        if (GameProgress.Instance == null)
+            return;
+
+        float mul = GameProgress.Instance.GetSpeedMultiplier();
+
+        maxSpeed = baseMaxSpeed * mul;
+        pushAcceleration = basePushAcceleration * mul;
+        boostAcceleration = baseBoostAcceleration * mul;
+    }
+
 
     // called from PlayerInput (Move action)
     public void OnMove(InputAction.CallbackContext context)

@@ -6,30 +6,21 @@ public class CoinUI : MonoBehaviour
     [Header("金币文本显示")]
     public TextMeshProUGUI coinText;
 
+    int lastShownValue = int.MinValue;
 
-    void OnEnable()
+    void Update()
     {
-        if (CoinManager.Instance != null)
-        {
-            UpdateCoinText(CoinManager.Instance.TotalCoins);
+        // 1. 没有 GameProgress 或 没有绑定文本，直接退出
+        if (GameProgress.Instance == null || coinText == null)
+            return;
 
-            CoinManager.Instance.OnCoinsChanged += UpdateCoinText;
-        }
-    }
+        int current = GameProgress.Instance.coins;
 
-    void OnDisable()
-    {
-        if (CoinManager.Instance != null)
+        // 2. 只有数值变化时才更新 UI（避免每帧改文本）
+        if (current != lastShownValue)
         {
-            CoinManager.Instance.OnCoinsChanged -= UpdateCoinText;
-        }
-    }
-
-    void UpdateCoinText(int amount)
-    {
-        if (coinText != null)
-        {
-            coinText.text = amount.ToString();
+            lastShownValue = current;
+            coinText.text = current.ToString();
         }
     }
 }

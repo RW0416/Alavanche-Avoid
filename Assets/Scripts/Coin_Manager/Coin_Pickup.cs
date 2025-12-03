@@ -1,4 +1,5 @@
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 public class CoinPickup : MonoBehaviour
 {
@@ -11,14 +12,11 @@ public class CoinPickup : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        // 确认是玩家
-        if (!other.CompareTag("Player"))
-            return;
 
-        // 确认有 CoinManager
-        if (CoinManager.Instance != null)
+        if (!other.CompareTag("Player")) return;
+        if (GameProgress.Instance != null)
         {
-            CoinManager.Instance.AddCoins(coinValue);
+            GameProgress.Instance.AddCoins(coinValue);
         }
 
         // 播放音效
