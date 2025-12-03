@@ -736,8 +736,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AvalancheController
   player: {fileID: 4615519780005885}
   trackRoot: {fileID: 1746827878}
-  playerController: {fileID: 850068206}
-  playerRagdoll: {fileID: 137557311608722252}
   baseSpeed: 20
   speedIncreasePerSecond: 0.2
   maxSpeed: 50
@@ -747,9 +745,6 @@ MonoBehaviour:
   chaseSpeed: 50
   sampleDistance: 50
   waypointReachEpsilon: 2
-  forwardImpulse: 100
-  upwardImpulse: 12
-  extraBodyImpulseMultiplier: 0.5
 --- !u!54 &197296213
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -13633,6 +13628,7 @@ GameObject:
   - component: {fileID: 850068204}
   - component: {fileID: 850068209}
   - component: {fileID: 850068210}
+  - component: {fileID: 4615519780005886}
   m_Layer: 0
   m_Name: Character_Snowboarder_01
   m_TagString: Player
@@ -15156,6 +15152,31 @@ Transform:
   - {fileID: 216229367}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4615519780005886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1341620583828241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a9a7b0265d72394bbba86885b0df166, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLifeSystem
+  controller: {fileID: 850068206}
+  ragdoll: {fileID: 137557311608722252}
+  playerBody: {fileID: 850068207}
+  avalanche: {fileID: 197296212}
+  speedScore: {fileID: 1475798077}
+  survivalTimer: {fileID: 1475798076}
+  startExtraLives: 1
+  extraLifePrefKey: ExtraLives
+  freezeDuration: 1
+  revivePushbackDistance: 100
+  fatalForwardImpulse: 25
+  fatalUpwardImpulse: 12
+  extraBodyImpulseMultiplier: 0.5
 --- !u!4 &4618656401309811
 Transform:
   m_ObjectHideFlags: 0

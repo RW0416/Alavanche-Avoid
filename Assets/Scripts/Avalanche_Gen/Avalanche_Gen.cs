@@ -1,15 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Avalanche_Gen : MonoBehaviour
+public class AvalancheController : MonoBehaviour
 {
     [Header("references")]
-    public Transform player;                 // Character_Snowboarder_01 root
-    public Transform trackRoot;              // Track_Root
-    public SnowboarderController playerController;
-    public SnowboarderRagdoll playerRagdoll;
+    public Transform player;        // Character_Snowboarder_01 root
+    public Transform trackRoot;     // Track_Root
 
     [Header("snow speed")]
     public float baseSpeed = 20f;
@@ -28,54 +25,48 @@ public class Avalanche_Gen : MonoBehaviour
     public float sampleDistance = 50f;
     public float waypointReachEpsilon = 2f;
 
-    [Header("impact – cannonball launch")]
-    public float forwardImpulse = 30f;          // along ground away from avalanche
-    public float upwardImpulse = 15f;           // upwards
-    public float extraBodyImpulseMultiplier = 0.5f;
-
     Rigidbody rb;
     readonly List<Vector3> waypoints = new List<Vector3>();
     Vector3 lastRecordedPlayerLocal;
     float elapsedTime;
-    bool hasHit;
+    bool isPaused;
+    bool hasHitPlayer;
 
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
-        rb.isKinematic = true;   // moved by script, but needed for triggers
+        rb.isKinematic = true;   // moved by script, but still uses trigger collider
     }
 
     void Start()
     {
         if (!player || !trackRoot)
         {
-            Debug.LogError("Avalanche_Gen: missing player or trackRoot.");
+            Debug.LogError("AvalancheController: missing player or trackRoot.");
             enabled = false;
             return;
         }
 
-        if (!playerController)
-            playerController = player.GetComponent<SnowboarderController>();
-        if (!playerRagdoll)
-            playerRagdoll = player.GetComponentInChildren<SnowboarderRagdoll>();
-
+        // first waypoint at player pos
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         lastRecordedPlayerLocal = playerLocal;
         waypoints.Clear();
         waypoints.Add(playerLocal);
 
+        // place avalanche behind player
         Vector3 myLocal = playerLocal;
-        myLocal.z += startOffsetZ;        // start behind player
+        myLocal.z += startOffsetZ;
         transform.localPosition = myLocal;
 
         elapsedTime = 0f;
-        hasHit = false;
+        isPaused = false;
+        hasHitPlayer = false;
     }
 
     void Update()
     {
-        if (hasHit) return;
+        if (isPaused) return;
         if (!player || !trackRoot) return;
 
         elapsedTime += Time.deltaTime;
@@ -83,7 +74,7 @@ public class Avalanche_Gen : MonoBehaviour
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         Vector3 myLocal = transform.localPosition;
 
-        // record the path the player took
+        // record path as player moves
         float movedSinceLast = Vector3.Distance(playerLocal, lastRecordedPlayerLocal);
         if (movedSinceLast >= sampleDistance)
         {
@@ -91,7 +82,7 @@ public class Avalanche_Gen : MonoBehaviour
             lastRecordedPlayerLocal = playerLocal;
         }
 
-        // choose speed
+        // dynamic speed
         float distToPlayer = Vector3.Distance(myLocal, playerLocal);
         float speed = distToPlayer > chaseDistanceThreshold
             ? chaseSpeed
@@ -118,89 +109,78 @@ public class Avalanche_Gen : MonoBehaviour
         }
         else
         {
-            // once we're out of waypoints, just roll downhill
+            // no waypoints, just roll downhill (local -Z)
             myLocal.z -= speed * Time.deltaTime;
             transform.localPosition = myLocal;
         }
 
-        // backup distance check in case trigger somehow misses
+        // backup distance check
         myLocal = transform.localPosition;
         distToPlayer = Vector3.Distance(myLocal, playerLocal);
-        if (distToPlayer <= catchDistance)
+        if (!hasHitPlayer && distToPlayer <= catchDistance)
         {
-            HitPlayer();
+            NotifyHit();
         }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (hasHit || player == null) return;
+        if (hasHitPlayer) return;
+        if (player == null) return;
 
-        // root collider OR any child collider of the player
-        if (other.transform == player || other.transform.IsChildOf(player))
-        {
-            HitPlayer();
-        }
+        // any collider inside the player rig
+        if (!other.transform.IsChildOf(player) && other.transform != player)
+            return;
+
+        NotifyHit();
     }
 
-    void HitPlayer()
+    void NotifyHit()
     {
-        if (hasHit) return;
-        hasHit = true;
+        if (hasHitPlayer) return;
+        hasHitPlayer = true;
 
-        Debug.Log("❄ avalanche hit player – cannonball ragdoll");
-
-        // direction: from avalanche → player, flattened on XZ
-        Vector3 dir = (player.position - transform.position);
-        dir.y = 0f;
-        if (dir.sqrMagnitude < 0.001f)
+        var life = player.GetComponent<PlayerLifeSystem>();
+        if (life != null)
         {
-            // fallback: push downhill
-            if (trackRoot != null)
-                dir = -trackRoot.forward;
-            else
-                dir = Vector3.forward;
+            life.OnAvalancheHit(this);
         }
-        dir.Normalize();
-
-        Vector3 impulse = dir * forwardImpulse + Vector3.up * upwardImpulse;
-
-        // 1) shove the main rigidbody BEFORE ragdoll so velocity is copied
-        Rigidbody mainBody = null;
-        if (playerRagdoll != null && playerRagdoll.mainBody != null)
-            mainBody = playerRagdoll.mainBody;
         else
-            mainBody = player.GetComponent<Rigidbody>();
-
-        if (mainBody != null)
         {
-            mainBody.AddForce(impulse, ForceMode.VelocityChange);
+            Debug.LogWarning("AvalancheController: PlayerLifeSystem not found on player.");
         }
-
-        // 2) stop the controller fighting physics
-        if (playerController != null)
-            playerController.enabled = false;
-
-        // 3) enable ragdoll
-        if (playerRagdoll != null)
-            playerRagdoll.EnableRagdoll();
-
-        // 4) next physics step, kick all ragdoll bodies too
-        StartCoroutine(ApplyImpulseNextFixed(impulse));
     }
 
-    IEnumerator ApplyImpulseNextFixed(Vector3 impulse)
+    // ===== public api used by PlayerLifeSystem =====
+
+    public void PauseChase()
     {
-        // wait until after the ragdoll has fully enabled its rigidbodies
-        yield return new WaitForFixedUpdate();
+        isPaused = true;
+    }
 
-        if (player == null) yield break;
+    public void ResumeChase()
+    {
+        isPaused = false;
+        hasHitPlayer = false;
+    }
 
-        var bodies = player.GetComponentsInChildren<Rigidbody>();
-        foreach (var body in bodies)
-        {
-            if (body != null && !body.isKinematic)
-                body.AddForce(impulse * extraBodyImpulseMultiplier, ForceMode.VelocityChange);
-        }
+    public void ResetBehindPlayer(float pushbackDistance)
+    {
+        if (!player || !trackRoot) return;
+
+        Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
+        lastRecordedPlayerLocal = playerLocal;
+        waypoints.Clear();
+        waypoints.Add(playerLocal);
+
+        float offset = pushbackDistance > 0f ? pushbackDistance : startOffsetZ;
+
+        Vector3 myLocal = playerLocal;
+        myLocal.z += offset;
+        transform.localPosition = myLocal;
+
+        elapsedTime = 0f;
+        isPaused = false;
+        hasHitPlayer = false;
     }
 }
