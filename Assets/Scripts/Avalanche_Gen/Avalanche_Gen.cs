@@ -1,80 +1,89 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Moves the avalanche and notifies PlayerLifeSystem when it hits the player.
+/// </summary>
 [RequireComponent(typeof(Rigidbody))]
 public class AvalancheController : MonoBehaviour
 {
-    [Header("references")]
-    public Transform player;        // Character_Snowboarder_01 root
+    [Header("References")]
+    public Transform player;        // Character_Snowboarder_01
     public Transform trackRoot;     // Track_Root
+    public PlayerLifeSystem playerLife;
 
-    [Header("snow speed")]
+    [Header("Snow Speed")]
     public float baseSpeed = 20f;
     public float speedIncreasePerSecond = 0.2f;
     public float maxSpeed = 50f;
 
-    [Header("chase settings")]
+    [Header("Chase Settings")]
     public float startOffsetZ = 100f;
     public float catchDistance = 5f;
 
-    [Header("catch-up tuning")]
+    [Header("Catch-up Tuning")]
     public float chaseDistanceThreshold = 200f;
     public float chaseSpeed = 50f;
 
-    [Header("path sampling")]
+    [Header("Path Sampling")]
     public float sampleDistance = 50f;
     public float waypointReachEpsilon = 2f;
 
-    Rigidbody rb;
     readonly List<Vector3> waypoints = new List<Vector3>();
     Vector3 lastRecordedPlayerLocal;
     float elapsedTime;
+    bool caught;
     bool isPaused;
-    bool hasHitPlayer;
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        var rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
-        rb.isKinematic = true;   // moved by script, but still uses trigger collider
+        rb.isKinematic = true;
     }
 
     void Start()
     {
-        if (!player || !trackRoot)
+        if (trackRoot == null && transform.parent != null)
+            trackRoot = transform.parent;
+
+        if (player == null || trackRoot == null)
         {
-            Debug.LogError("AvalancheController: missing player or trackRoot.");
+            Debug.LogError("[AvalancheController] player or trackRoot not set.");
             enabled = false;
             return;
         }
 
-        // first waypoint at player pos
+        if (playerLife == null)
+            playerLife = player.GetComponent<PlayerLifeSystem>();
+
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         lastRecordedPlayerLocal = playerLocal;
         waypoints.Clear();
         waypoints.Add(playerLocal);
 
-        // place avalanche behind player
         Vector3 myLocal = playerLocal;
         myLocal.z += startOffsetZ;
         transform.localPosition = myLocal;
 
         elapsedTime = 0f;
+        caught = false;
         isPaused = false;
-        hasHitPlayer = false;
     }
 
     void Update()
     {
-        if (isPaused) return;
-        if (!player || !trackRoot) return;
+        if (caught || isPaused)
+            return;
+        if (player == null || trackRoot == null)
+            return;
 
         elapsedTime += Time.deltaTime;
 
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         Vector3 myLocal = transform.localPosition;
 
-        // record path as player moves
+        // record player path
         float movedSinceLast = Vector3.Distance(playerLocal, lastRecordedPlayerLocal);
         if (movedSinceLast >= sampleDistance)
         {
@@ -82,13 +91,12 @@ public class AvalancheController : MonoBehaviour
             lastRecordedPlayerLocal = playerLocal;
         }
 
-        // dynamic speed
         float distToPlayer = Vector3.Distance(myLocal, playerLocal);
-        float speed = distToPlayer > chaseDistanceThreshold
+        float speed = (distToPlayer > chaseDistanceThreshold)
             ? chaseSpeed
             : Mathf.Min(baseSpeed + speedIncreasePerSecond * elapsedTime, maxSpeed);
 
-        // follow the path
+        // follow waypoints
         if (waypoints.Count > 0)
         {
             Vector3 target = waypoints[0];
@@ -109,64 +117,50 @@ public class AvalancheController : MonoBehaviour
         }
         else
         {
-            // no waypoints, just roll downhill (local -Z)
+            // roll downhill in local -Z
             myLocal.z -= speed * Time.deltaTime;
             transform.localPosition = myLocal;
         }
 
-        // backup distance check
+        // backup distance catch
         myLocal = transform.localPosition;
         distToPlayer = Vector3.Distance(myLocal, playerLocal);
-        if (!hasHitPlayer && distToPlayer <= catchDistance)
-        {
-            NotifyHit();
-        }
+        if (distToPlayer <= catchDistance)
+            OnCaughtPlayer();
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (hasHitPlayer) return;
-        if (player == null) return;
-
-        // any collider inside the player rig
-        if (!other.transform.IsChildOf(player) && other.transform != player)
+        if (caught || player == null)
             return;
 
-        NotifyHit();
+        if (other.transform == player || other.transform.IsChildOf(player))
+            OnCaughtPlayer();
     }
 
-    void NotifyHit()
+    void OnCaughtPlayer()
     {
-        if (hasHitPlayer) return;
-        hasHitPlayer = true;
+        if (caught)
+            return;
 
-        var life = player.GetComponent<PlayerLifeSystem>();
-        if (life != null)
-        {
-            life.OnAvalancheHit(this);
-        }
-        else
-        {
-            Debug.LogWarning("AvalancheController: PlayerLifeSystem not found on player.");
-        }
+        caught = true;
+        Debug.Log("[AvalancheController] caught player, notifying PlayerLifeSystem.");
+
+        if (playerLife != null)
+            playerLife.OnAvalancheHit(this);
     }
 
-    // ===== public api used by PlayerLifeSystem =====
+    // ===== API used by PlayerLifeSystem =====
 
     public void PauseChase()
     {
         isPaused = true;
     }
 
-    public void ResumeChase()
-    {
-        isPaused = false;
-        hasHitPlayer = false;
-    }
-
     public void ResetBehindPlayer(float pushbackDistance)
     {
-        if (!player || !trackRoot) return;
+        if (player == null || trackRoot == null)
+            return;
 
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         lastRecordedPlayerLocal = playerLocal;
@@ -180,7 +174,7 @@ public class AvalancheController : MonoBehaviour
         transform.localPosition = myLocal;
 
         elapsedTime = 0f;
+        caught = false;
         isPaused = false;
-        hasHitPlayer = false;
     }
 }
