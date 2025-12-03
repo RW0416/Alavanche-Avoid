@@ -1,78 +1,89 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class AvalancheController : MonoBehaviour
+[RequireComponent(typeof(Rigidbody))]
+public class Avalanche_Gen : MonoBehaviour
 {
-    [Header("References")]
-    public Transform player;      // Reference to the player object
-    public Transform trackRoot;   // Transform that defines the local track coordinate system
+    [Header("references")]
+    public Transform player;                 // Character_Snowboarder_01 root
+    public Transform trackRoot;              // Track_Root
+    public SnowboarderController playerController;
+    public SnowboarderRagdoll playerRagdoll;
 
-    [Header("Snow Speed")]
-    public float baseSpeed = 15f;              // Initial avalanche speed
-    public float speedIncreasePerSecond = 0.7f; // Speed increase over time
-    public float maxSpeed = 55f;               // Maximum avalanche speed limit
+    [Header("snow speed")]
+    public float baseSpeed = 20f;
+    public float speedIncreasePerSecond = 0.2f;
+    public float maxSpeed = 50f;
 
-    [Header("Chase Settings")]
-    public float startOffsetZ = 100f;      // Initial distance behind the player in local Z space
-    public float catchDistance = 5f;       // Game over if avalanche is closer than this distance
+    [Header("chase settings")]
+    public float startOffsetZ = 100f;
+    public float catchDistance = 5f;
 
-    [Header("Catch-up Tuning")]
-    public float chaseDistanceThreshold = 200f; // If distance to the player exceeds this, enter catch-up mode
-    public float chaseSpeed = 50f;              // Fixed high speed when in catch-up mode
+    [Header("catch-up tuning")]
+    public float chaseDistanceThreshold = 200f;
+    public float chaseSpeed = 50f;
 
-    [Header("Path Sampling")]
-    public float sampleDistance = 50f;      // Record a new waypoint every time the player moves this distance
-    public float waypointReachEpsilon = 2f; // Consider waypoint "reached" when within this distance
+    [Header("path sampling")]
+    public float sampleDistance = 50f;
+    public float waypointReachEpsilon = 2f;
 
-    private float elapsedTime = 0f;
-    private bool caught = false;
+    [Header("impact – cannonball launch")]
+    public float forwardImpulse = 30f;          // along ground away from avalanche
+    public float upwardImpulse = 15f;           // upwards
+    public float extraBodyImpulseMultiplier = 0.5f;
 
-    // List of recorded player positions (stored in TrackRoot local space)
-    private readonly List<Vector3> waypoints = new List<Vector3>();
-    private Vector3 lastRecordedPlayerLocal;  // The last recorded sample position of the player
+    Rigidbody rb;
+    readonly List<Vector3> waypoints = new List<Vector3>();
+    Vector3 lastRecordedPlayerLocal;
+    float elapsedTime;
+    bool hasHit;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        rb.useGravity = false;
+        rb.isKinematic = true;   // moved by script, but needed for triggers
+    }
 
     void Start()
     {
-        // Auto-assign trackRoot if avalanche object is already parented under TrackRoot
-        if (trackRoot == null)
+        if (!player || !trackRoot)
         {
-            trackRoot = transform.parent;
-        }
-
-        if (player == null || trackRoot == null)
-        {
-            Debug.LogError("AvalancheController: Player and TrackRoot references must be assigned.");
+            Debug.LogError("Avalanche_Gen: missing player or trackRoot.");
             enabled = false;
             return;
         }
 
-        // Initialize first waypoint using player's current local position
+        if (!playerController)
+            playerController = player.GetComponent<SnowboarderController>();
+        if (!playerRagdoll)
+            playerRagdoll = player.GetComponentInChildren<SnowboarderRagdoll>();
+
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         lastRecordedPlayerLocal = playerLocal;
         waypoints.Clear();
         waypoints.Add(playerLocal);
 
-        // Position avalanche behind the player at the starting offset distance
         Vector3 myLocal = playerLocal;
-        myLocal.z += startOffsetZ;   // Since downhill movement is along negative Z, behind = +Z
+        myLocal.z += startOffsetZ;        // start behind player
         transform.localPosition = myLocal;
 
         elapsedTime = 0f;
-        caught = false;
+        hasHit = false;
     }
 
     void Update()
     {
-        if (caught) return;
+        if (hasHit) return;
         if (!player || !trackRoot) return;
 
         elapsedTime += Time.deltaTime;
 
-        // Convert current positions into track-local coordinate space
         Vector3 playerLocal = trackRoot.InverseTransformPoint(player.position);
         Vector3 myLocal = transform.localPosition;
 
-        // Record a new waypoint when the player has moved far enough
+        // record the path the player took
         float movedSinceLast = Vector3.Distance(playerLocal, lastRecordedPlayerLocal);
         if (movedSinceLast >= sampleDistance)
         {
@@ -80,84 +91,116 @@ public class AvalancheController : MonoBehaviour
             lastRecordedPlayerLocal = playerLocal;
         }
 
-        // Compute distance to player to determine whether speed boost is needed
+        // choose speed
         float distToPlayer = Vector3.Distance(myLocal, playerLocal);
+        float speed = distToPlayer > chaseDistanceThreshold
+            ? chaseSpeed
+            : Mathf.Min(baseSpeed + speedIncreasePerSecond * elapsedTime, maxSpeed);
 
-        float speed;
-        if (distToPlayer > chaseDistanceThreshold)
-        {
-            // Too far behind → enter catch-up mode
-            speed = chaseSpeed;
-        }
-        else
-        {
-            // Normal acceleration curve: base speed + time-based ramp, clamped to a max
-            speed = Mathf.Min(baseSpeed + speedIncreasePerSecond * elapsedTime, maxSpeed);
-        }
-
-        // Follow stored player path (waypoints)
+        // follow the path
         if (waypoints.Count > 0)
         {
-            // Move toward the oldest recorded waypoint
             Vector3 target = waypoints[0];
-
             Vector3 toTarget = target - myLocal;
             float distanceToTarget = toTarget.magnitude;
 
             if (distanceToTarget <= waypointReachEpsilon)
             {
-                // Reached this waypoint → remove it and move toward the next one
                 waypoints.RemoveAt(0);
             }
             else
             {
-                // Move toward measured player path direction
                 Vector3 dir = toTarget.normalized;
                 float moveDist = speed * Time.deltaTime;
-
-                if (moveDist >= distanceToTarget)
-                {
-                    // Snap directly to waypoint if close enough
-                    myLocal = target;
-                }
-                else
-                {
-                    // Move partially toward target
-                    myLocal += dir * moveDist;
-                }
-
+                myLocal += dir * Mathf.Min(distanceToTarget, moveDist);
                 transform.localPosition = myLocal;
             }
         }
         else
         {
-            // No remaining waypoints → avalanche continues down the slope
-            //
-            // NOTE: TrackRoot already defines slope orientation, so modifying local Z
-            // will naturally move avalanche downhill in world space (Y+Z movement).
+            // once we're out of waypoints, just roll downhill
             myLocal.z -= speed * Time.deltaTime;
             transform.localPosition = myLocal;
         }
 
-        // After movement, check if avalanche has caught the player
+        // backup distance check in case trigger somehow misses
         myLocal = transform.localPosition;
         distToPlayer = Vector3.Distance(myLocal, playerLocal);
-
         if (distToPlayer <= catchDistance)
         {
-            OnCaughtPlayer();
+            HitPlayer();
         }
     }
 
-    void OnCaughtPlayer()
+    void OnTriggerEnter(Collider other)
     {
-        if (caught) return;
-        caught = true;
+        if (hasHit || player == null) return;
 
-        Debug.Log("❄ Avalanche caught the player!");
+        // root collider OR any child collider of the player
+        if (other.transform == player || other.transform.IsChildOf(player))
+        {
+            HitPlayer();
+        }
+    }
 
-        // Pause time as a basic Game Over reaction (replace with UI logic later)
-        Time.timeScale = 0f;
+    void HitPlayer()
+    {
+        if (hasHit) return;
+        hasHit = true;
 
+        Debug.Log("❄ avalanche hit player – cannonball ragdoll");
+
+        // direction: from avalanche → player, flattened on XZ
+        Vector3 dir = (player.position - transform.position);
+        dir.y = 0f;
+        if (dir.sqrMagnitude < 0.001f)
+        {
+            // fallback: push downhill
+            if (trackRoot != null)
+                dir = -trackRoot.forward;
+            else
+                dir = Vector3.forward;
+        }
+        dir.Normalize();
+
+        Vector3 impulse = dir * forwardImpulse + Vector3.up * upwardImpulse;
+
+        // 1) shove the main rigidbody BEFORE ragdoll so velocity is copied
+        Rigidbody mainBody = null;
+        if (playerRagdoll != null && playerRagdoll.mainBody != null)
+            mainBody = playerRagdoll.mainBody;
+        else
+            mainBody = player.GetComponent<Rigidbody>();
+
+        if (mainBody != null)
+        {
+            mainBody.AddForce(impulse, ForceMode.VelocityChange);
+        }
+
+        // 2) stop the controller fighting physics
+        if (playerController != null)
+            playerController.enabled = false;
+
+        // 3) enable ragdoll
+        if (playerRagdoll != null)
+            playerRagdoll.EnableRagdoll();
+
+        // 4) next physics step, kick all ragdoll bodies too
+        StartCoroutine(ApplyImpulseNextFixed(impulse));
+    }
+
+    IEnumerator ApplyImpulseNextFixed(Vector3 impulse)
+    {
+        // wait until after the ragdoll has fully enabled its rigidbodies
+        yield return new WaitForFixedUpdate();
+
+        if (player == null) yield break;
+
+        var bodies = player.GetComponentsInChildren<Rigidbody>();
+        foreach (var body in bodies)
+        {
+            if (body != null && !body.isKinematic)
+                body.AddForce(impulse * extraBodyImpulseMultiplier, ForceMode.VelocityChange);
+        }
     }
 }
