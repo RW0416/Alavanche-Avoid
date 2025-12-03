@@ -1,83 +1,90 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Camera))]
 public class CameraShake : MonoBehaviour
 {
     [Header("shake settings")]
-    public float duration = 0.5f;
-    public float amplitude = 0.3f;
+    public float defaultDuration = 0.5f;
+    public float defaultAmplitude = 0.3f;
     public float frequency = 20f;
 
     [Header("auto")]
     public bool autoShakeOnEnable = false;
     public float autoShakeDelay = 0f;
 
-    Vector3 _originalLocalPos;
-    Coroutine _shakeRoutine;
+    CutsceneCameraFollow follow;
+    Vector3 baseOffset = Vector3.zero;
+    Coroutine shakeRoutine;
 
     void Awake()
     {
-        _originalLocalPos = transform.localPosition;
+        follow = GetComponent<CutsceneCameraFollow>();
+        if (follow != null)
+            baseOffset = follow.positionOffset;
     }
 
     void OnEnable()
     {
-        _originalLocalPos = transform.localPosition;
-
         if (autoShakeOnEnable)
         {
-            if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
-            _shakeRoutine = StartCoroutine(ShakeWithDelay(autoShakeDelay));
+            if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+            shakeRoutine = StartCoroutine(ShakeRoutine(defaultDuration, defaultAmplitude, autoShakeDelay));
         }
     }
 
     void OnDisable()
     {
-        if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
-        transform.localPosition = _originalLocalPos;
+        if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+
+        if (follow != null)
+            follow.positionOffset = baseOffset;
+        else
+            transform.localPosition = Vector3.zero;
     }
 
     public void Shake()
     {
-        if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
-        _shakeRoutine = StartCoroutine(ShakeRoutine(duration, amplitude));
+        Shake(defaultDuration, defaultAmplitude);
     }
 
-    public void Shake(float customDuration, float customAmplitude)
+    public void Shake(float duration, float amplitude)
     {
-        if (_shakeRoutine != null) StopCoroutine(_shakeRoutine);
-        _shakeRoutine = StartCoroutine(ShakeRoutine(customDuration, customAmplitude));
+        if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+        shakeRoutine = StartCoroutine(ShakeRoutine(duration, amplitude, 0f));
     }
 
-    IEnumerator ShakeWithDelay(float delay)
+    IEnumerator ShakeRoutine(float duration, float amplitude, float delay)
     {
         if (delay > 0f)
             yield return new WaitForSeconds(delay);
 
-        yield return ShakeRoutine(duration, amplitude);
-        _shakeRoutine = null;
-    }
-
-    IEnumerator ShakeRoutine(float dur, float amp)
-    {
         float elapsed = 0f;
 
-        while (elapsed < dur)
+        while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
 
-            float damper = 1f - Mathf.Clamp01(elapsed / dur);
+            float damper = 1f - Mathf.Clamp01(elapsed / duration);
 
             float x = (Mathf.PerlinNoise(0f, Time.time * frequency) - 0.5f) * 2f;
             float y = (Mathf.PerlinNoise(1f, Time.time * frequency) - 0.5f) * 2f;
 
-            Vector3 offset = new Vector3(x, y, 0f) * amp * damper;
-            transform.localPosition = _originalLocalPos + offset;
+            Vector3 offset = new Vector3(x, y, 0f) * amplitude * damper;
+
+            if (follow != null)
+                follow.positionOffset = baseOffset + offset;
+            else
+                transform.localPosition = offset;
 
             yield return null;
         }
 
-        transform.localPosition = _originalLocalPos;
-        _shakeRoutine = null;
+        if (follow != null)
+            follow.positionOffset = baseOffset;
+        else
+            transform.localPosition = Vector3.zero;
+
+        shakeRoutine = null;
     }
 }
