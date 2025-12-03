@@ -8573,6 +8573,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 1687435939730044, guid: 7f37db7dc13bfa6468e127fef674d78c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2046145409}
+    - targetCorrespondingSourceObject: {fileID: 1687435939730044, guid: 7f37db7dc13bfa6468e127fef674d78c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2046145413}
   m_SourcePrefab: {fileID: 100100000, guid: 7f37db7dc13bfa6468e127fef674d78c, type: 3}
 --- !u!4 &308156587 stripped
 Transform:
@@ -57282,6 +57285,26 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 7e36b8baf093509408dcc12e670f3d91, type: 3}
+--- !u!114 &2046145413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2046145404}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 372b8a19246282541b70577ea7b48367, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GarageUpgradeStation
+  upgradeType: 2
+  baseCost: 200
+  costPerLevel: 50
+  maxLevel: 1
+  interactRadius: 2.5
+  playerTag: Player
+  interactKey: 19
+  worldText: {fileID: 0}
 --- !u!4 &2047386374 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4000011275134666, guid: a6dbabfd6d3c8cb47b7243b0b8723af2, type: 3}

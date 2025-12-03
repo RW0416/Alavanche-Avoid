@@ -46,23 +46,34 @@ public class PlayerLifeSystem : MonoBehaviour
             ragdoll = GetComponentInChildren<SnowboarderRagdoll>();
 
         if (avalanche == null)
-            avalanche = FindObjectOfType<AvalancheController>();
+            avalanche = FindFirstObjectByType<AvalancheController>();
 
         if (speedScore == null)
-            speedScore = FindObjectOfType<SpeedScoreGenerator>();
+            speedScore = FindFirstObjectByType<SpeedScoreGenerator>();
 
         if (survivalTimer == null)
-            survivalTimer = FindObjectOfType<SurvivalTimerUI>();
+            survivalTimer = FindFirstObjectByType<SurvivalTimerUI>();
 
         if (gameOverUI == null)
-            gameOverUI = FindObjectOfType<GameOverUI>();
+            gameOverUI = FindFirstObjectByType<GameOverUI>();
 
-        extraLives = Mathf.Max(0, baseExtraLives);
+        // ★ 这里接 GameProgress ★
+        int startExtra = baseExtraLives;
+
+        if (GameProgress.Instance != null)
+        {
+            // 假设 1 个等级 = 多 1 条命
+            startExtra += GameProgress.Instance.extraLifeLevel;
+        }
+
+        extraLives = Mathf.Max(0, startExtra);
+
         isGameOver = false;
         savedTimeScale = Time.timeScale;
 
         Debug.Log($"[PlayerLifeSystem] start extraLives = {extraLives}");
     }
+
 
     // optional override from Garage
     public void SetExtraLives(int value)
@@ -199,13 +210,27 @@ public class PlayerLifeSystem : MonoBehaviour
         if (extraLives <= 0)
             return;
 
+        // 先扣掉本局的命
         extraLives--;
-        Debug.Log($"[PlayerLifeSystem] UseExtraLife -> remaining = {extraLives}");
+        Debug.Log($"[PlayerLifeSystem] UseExtraLife -> remaining in this run = {extraLives}");
 
-        // restore time
+        // ★ 同步扣掉存档里的 ExtraLife 等级（把它当成“存货”）
+        if (GameProgress.Instance != null)
+        {
+            if (GameProgress.Instance.extraLifeLevel > 0)
+            {
+                GameProgress.Instance.extraLifeLevel--;
+                GameProgress.Instance.Save();
+                Debug.Log($"[PlayerLifeSystem] Consumed 1 extraLifeLevel, now = {GameProgress.Instance.extraLifeLevel}");
+            }
+        }
+
+        // ===== 剩下的逻辑保持原样 =====
+
+        // 恢复时间
         Time.timeScale = (savedTimeScale <= 0f) ? 1f : savedTimeScale;
 
-        // relock mouse for gameplay
+        // 锁回鼠标
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -232,4 +257,5 @@ public class PlayerLifeSystem : MonoBehaviour
 
         isGameOver = false;
     }
+
 }
