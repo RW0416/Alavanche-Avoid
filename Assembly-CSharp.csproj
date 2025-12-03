@@ -62,25 +62,28 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUI.cs" />
+    <Compile Include="Assets\Scripts\UI\ScoreManager.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_Rotator.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Managers\UISettingsManager.cs" />
-    <Compile Include="Assets\Scripts\ScoreManager.cs" />
-    <Compile Include="Assets\Scripts\SnowDeformer.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SnowTerrain.cs" />
+    <Compile Include="Assets\Scripts\Effect\SnowDeformer.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUIElement.cs" />
     <Compile Include="Assets\Scripts\Progression\Garage_Upgrade_Station.cs" />
+    <Compile Include="Assets\Scripts\Movement\SnowboarderTricks.cs" />
     <Compile Include="Assets\Scripts\Garage Scripts\WorldPrompt.cs" />
     <Compile Include="Assets\Scripts\Progression\PlayerLifeSystem.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_InteractiveEffects.cs" />
     <Compile Include="Assets\Scripts\Coin_Manager\Coin_UI.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualJoystick.cs" />
+    <Compile Include="Assets\Scripts\Movement\BoardDetachOnDeath.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Rotation.cs" />
+    <Compile Include="Assets\Scripts\Movement\SnowboarderController.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\SnowboarderRagdoll.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerMovement.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SquareBanding.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerReset.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Avalanche_Block_Gen.cs" />
-    <Compile Include="Assets\Scripts\SnowboarderAnimationBridge.cs" />
+    <Compile Include="Assets\Scripts\Movement\SnowboarderAnimationBridge.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_InputSystemSwitcher.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Misc\ExtraLinks.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
@@ -92,7 +95,6 @@
     <Compile Include="Assets\Scripts\UI\SurvivalTimerUI.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SnowSubShowcase.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Avalanche_Gen.cs" />
-    <Compile Include="Assets\Scripts\SnowboarderController.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerSnow.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Line_effect.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\KeepRagdollVisible.cs" />
@@ -102,21 +104,17 @@
     <Compile Include="Assets\BruteForce\Scripts\BF_InteractiveEffectsAdditional.cs" />
     <Compile Include="Assets\Scripts\Track_Gen\Track_Slope_Control.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Audio\CheckMusicVolume.cs" />
-    <Compile Include="Assets\Scripts\BoardDetachOnDeath.cs" />
-    <Compile Include="Assets\Scripts\SnowTrailToggle.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Audio\CheckSFXVolume.cs" />
     <Compile Include="Assets\Scripts\Garage Scripts\SceneTransition.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\Utilities\MobileDisableAutoSwitchControls.cs" />
     <Compile Include="Assets\Scripts\UI\GameOverUI.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_FPS.cs" />
     <Compile Include="Assets\Scripts\UI\SpeedScoreGenerator.cs" />
-    <Compile Include="Assets\Scripts\SnowboarderTricks.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_LightSwitch.cs" />
     <Compile Include="Assets\Scripts\Track_Gen\Infinite_Track.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\ThirdPersonController\Scripts\ThirdPersonController.cs" />
     <Compile Include="Assets\Scripts\Progression\Game_Progress.cs" />
     <Compile Include="Assets\BruteForce\Extra\BloomKino\BloomKino.cs" />
-    <Compile Include="Assets\Scripts\Coin_Manager\Coin_Manage.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SnowAssetManager.cs" />
     <Compile Include="Assets\Scripts\Coin_Manager\Back to Garage.cs" />
     <Compile Include="Assets\Scripts\UI\UIWobble.cs" />
@@ -125,6 +123,7 @@
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Managers\UIMenuManager.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_FxMouse.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\ThirdPersonController\Scripts\BasicRigidBodyPush.cs" />
+    <Compile Include="Assets\Scripts\Effect\SnowTrailToggle.cs" />
     <Compile Include="Assets\Scripts\Coin_Manager\Coin_Pickup.cs" />
   </ItemGroup>
   <ItemGroup>
