@@ -59,6 +59,7 @@
     <Compile Include="Assets\Scripts\Movement\SnowboarderTricks.cs" />
     <Compile Include="Assets\Scripts\Garage Scripts\WorldPrompt.cs" />
     <Compile Include="Assets\Scripts\Progression\PlayerLifeSystem.cs" />
+    <Compile Include="Assets\Scripts\CutScene\CutsceneNPCMover.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_InteractiveEffects.cs" />
     <Compile Include="Assets\Scripts\Coin_Manager\Coin_UI.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualJoystick.cs" />
@@ -74,8 +75,10 @@
     <Compile Include="Assets\BruteForce\Scripts\BF_InputSystemSwitcher.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Misc\ExtraLinks.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualTouchZone.cs" />
+    <Compile Include="Assets\Scripts\CutScene\CutsceneCheckpointSwitch.cs" />
     <Compile Include="Assets\Scripts\Track_Gen\Obstacle_Gen.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\CanvasInputs\UICanvasControllerInput.cs" />
+    <Compile Include="Assets\Scripts\CutScene\CameraShake.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_AddSnow.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\ThemeEditor\ThemedUIData.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Misc\ResetDemo.cs" />
@@ -100,6 +103,7 @@
     <Compile Include="Assets\BruteForce\Scripts\BF_LightSwitch.cs" />
     <Compile Include="Assets\Scripts\Track_Gen\Infinite_Track.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\ThirdPersonController\Scripts\ThirdPersonController.cs" />
+    <Compile Include="Assets\Scripts\CutScene\CutsceneCameraFollow.cs" />
     <Compile Include="Assets\Scripts\Progression\Game_Progress.cs" />
     <Compile Include="Assets\BruteForce\Extra\BloomKino\BloomKino.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SnowAssetManager.cs" />
@@ -109,6 +113,7 @@
     <Compile Include="Assets\Unity Asset Store\StarterAssets\Mobile\Scripts\VirtualInputs\UIVirtualButton.cs" />
     <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Managers\UIMenuManager.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_FxMouse.cs" />
+    <Compile Include="Assets\Scripts\CutScene\SecondNpcTurnAndRun.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\ThirdPersonController\Scripts\BasicRigidBodyPush.cs" />
     <Compile Include="Assets\Scripts\Effect\SnowTrailToggle.cs" />
     <Compile Include="Assets\Scripts\Coin_Manager\Coin_Pickup.cs" />

@@ -367,7 +367,7 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0, g: 0.65999997, b: 0.73, a: 1}
     - _BotColor: {r: 0.73383, g: 0.74201936, b: 0.802, a: 1}
-    - _Color: {r: 1, g: 0.7311321, b: 0.9967946, a: 1}
+    - _Color: {r: 0.77254903, g: 0.77254903, b: 0.77254903, a: 1}
     - _CracksStrength: {r: -0.1, g: -0.2, b: 0.16, a: -0.11}
     - _Emission: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

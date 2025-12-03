@@ -6,7 +6,7 @@ public class SceneLoader : MonoBehaviour
 {
     [Header("Scene Settings")]
     [Tooltip("Type the exact name of the scene you want to load")]
-    public string sceneToLoad = "Game Scene"; 
+    public string sceneToLoad = "Cut Scene"; 
     
     [Header("Interaction Settings")]
     [Tooltip("Size of the interaction box (Width, Height, Depth)")]

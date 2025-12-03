@@ -59585,7 +59585,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 18e393a9968731043a6af060bde5116a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneLoader
-  sceneToLoad: Game Scene
+  sceneToLoad: Cut Scene
   interactionBoxSize: {x: 2.85, y: 1, z: 0.6}
   interactionBoxOffset: {x: 0, y: 0, z: 0}
   interactKey: 19
