@@ -84,6 +84,7 @@
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerSnow.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Line_effect.cs" />
     <Compile Include="Assets\Scripts\UIWobble.cs" />
+    <Compile Include="Assets\Scripts\Avalanche_Gen\KeepRagdollVisible.cs" />
     <Compile Include="Assets\Unity Asset Store\StarterAssets\InputSystem\StarterAssetsInputs.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_InteractiveEffectsAdditional.cs" />

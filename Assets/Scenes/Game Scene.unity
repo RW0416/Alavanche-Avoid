@@ -13781,6 +13781,7 @@ GameObject:
   - component: {fileID: 137557311608722251}
   - component: {fileID: 137557311608722250}
   - component: {fileID: 137557311608722252}
+  - component: {fileID: 137557311608722253}
   m_Layer: 0
   m_Name: Character_Snow_Male_01
   m_TagString: Untagged
@@ -16080,6 +16081,19 @@ MonoBehaviour:
   mainBody: {fileID: 850068207}
   mainCollider: {fileID: 850068204}
   boardDetach: {fileID: 1927183653}
+--- !u!114 &137557311608722253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1611212282611023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e11e498e30bc3d439d50315e8eedf08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::KeepRagdollVisible
+  boundsSize: 500
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
