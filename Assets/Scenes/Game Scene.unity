@@ -6608,9 +6608,9 @@ MonoBehaviour:
   brakePoseLerp: 10
   brakeBackLeanAngle: 20
   rotationScoreThreshold: 0.7
-  frontFlipScore: 10
-  backFlipScore: 15
-  spinScore: 5
+  frontFlipScore: 100
+  backFlipScore: 150
+  spinScore: 50
 --- !u!114 &850068210
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12962,7 +12962,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
