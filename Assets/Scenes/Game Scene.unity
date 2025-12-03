@@ -6642,6 +6642,7 @@ MonoBehaviour:
   frontFlipScore: 100
   backFlipScore: 150
   spinScore: 50
+  flipLandingForgiveness: 0.4
 --- !u!114 &850068210
 MonoBehaviour:
   m_ObjectHideFlags: 0

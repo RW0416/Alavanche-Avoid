@@ -43,7 +43,13 @@ public class SnowboarderTricks : MonoBehaviour
     public int backFlipScore = 10;
     public int spinScore = 5;
 
+    [Header("Flip Landing Safety")]
+    [Range(0f, 1f)]
+    [Tooltip("Max allowed 'not upright' percent when landing a flip. 0 = super strict, 1 = you basically never die from flips. Example: 0.8 means if you're more than 80% upside-down you die.")]
+    public float flipLandingForgiveness = 0.8f;
+
     Transform visualRoot;
+    PlayerLifeSystem lifeSystem;
 
     // input
     Vector2 moveInput;
@@ -91,6 +97,7 @@ public class SnowboarderTricks : MonoBehaviour
             return absSpin > absFlip + 5f;
         }
     }
+
     void Awake()
     {
         if (!controller)
@@ -104,11 +111,14 @@ public class SnowboarderTricks : MonoBehaviour
             return;
         }
 
-        // 记录基础值
+        // trick death hooks into PlayerLifeSystem
+        lifeSystem = FindFirstObjectByType<PlayerLifeSystem>();
+
+        // record base values
         baseFlipSpeed = flipSpeed;
         baseSpinSpeed = spinSpeed;
 
-        // 应用升级
+        // apply upgrades
         if (GameProgress.Instance != null)
         {
             float mul = GameProgress.Instance.GetTrickSpeedMultiplier();
@@ -116,7 +126,6 @@ public class SnowboarderTricks : MonoBehaviour
             spinSpeed = baseSpinSpeed * mul;
         }
     }
-
 
     // from PlayerInput (Move)
     public void OnMove(InputAction.CallbackContext context)
@@ -159,7 +168,6 @@ public class SnowboarderTricks : MonoBehaviour
         if (braking && !prevBraking)
         {
             // Always use the same orientation for brake pose.
-            // This makes S, S+D, and A then S all end up in the SAME pose.
             brakeSide = 1f;
         }
         prevBraking = braking;
@@ -169,7 +177,6 @@ public class SnowboarderTricks : MonoBehaviour
         {
             inJump = true;
 
-            // tricks only start on another space press in air
             trickArmed = false;
             jumpHeld = false;
 
@@ -187,9 +194,17 @@ public class SnowboarderTricks : MonoBehaviour
 
         if (justLanded)
         {
+            // check flip landing: only flips matter, spins don't affect upright
+            bool died = CheckFlipLandingDeath();
             inJump = false;
             trickArmed = false;
             jumpHeld = false;
+
+            if (died)
+            {
+                prevGrounded = grounded;
+                return; // stop updating tricks this frame; death logic takes over
+            }
         }
 
         // --- trick control in air ---
@@ -255,10 +270,9 @@ public class SnowboarderTricks : MonoBehaviour
             lastSpinAngle = spinAngle;
         }
 
-        // --- recover upright when on ground ---
+        // --- recover upright when on ground (only if we survived) ---
         if (grounded && !inJump)
         {
-            // bring trick angles back towards neutral
             flipAngle = Mathf.MoveTowardsAngle(flipAngle, 0f, uprightRecoverySpeed * dt);
             spinAngle = Mathf.MoveTowardsAngle(spinAngle, 0f, uprightRecoverySpeed * dt);
 
@@ -271,6 +285,47 @@ public class SnowboarderTricks : MonoBehaviour
         UpdateVisualRotation(dt, grounded, braking);
     }
 
+    /// <summary>
+    /// Returns true if the landing killed the player.
+    /// Only cares about flipAngle (front/back), not spinAngle (flat spins).
+    /// </summary>
+    bool CheckFlipLandingDeath()
+    {
+        // if slider is 1, never kill from flips
+        if (flipLandingForgiveness >= 1f)
+            return false;
+
+        // how far from upright in degrees (0 = upright, 180 = fully upside-down)
+        float angleFromUpright = Mathf.Abs(Mathf.DeltaAngle(0f, flipAngle));
+        float notUprightPercent = angleFromUpright / 180f;   // 0..1
+
+        // tiny noise? ignore
+        if (angleFromUpright < 1f)
+            return false;
+
+        // only kill if "not upright" percent is above the slider threshold
+        if (notUprightPercent > flipLandingForgiveness)
+        {
+            Debug.Log($"[SnowboarderTricks] Bad flip landing: angle={angleFromUpright:F1}°, notUpright={notUprightPercent:F2}");
+
+            if (lifeSystem != null)
+            {
+                lifeSystem.KillFromTrickCrash();
+            }
+            else
+            {
+                // fallback: just ragdoll
+                var rag = FindFirstObjectByType<SnowboarderRagdoll>();
+                if (rag != null)
+                    rag.EnableRagdoll();
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     void UpdateVisualRotation(float dt, bool grounded, bool braking)
     {
         Quaternion baseRot = controller.transform.rotation;
@@ -279,12 +334,10 @@ public class SnowboarderTricks : MonoBehaviour
         float targetLean = 0f;
         if (grounded && !inJump && !braking)
         {
-            // regular carve lean (A/D)
             targetLean = -moveInput.x * maxTurnYaw;
         }
         else if (grounded && braking)
         {
-            // separate brake lean – lean back instead of forward
             targetLean = -brakeBackLeanAngle;
         }
         Quaternion leanRot = Quaternion.AngleAxis(targetLean, Vector3.forward);
@@ -316,11 +369,9 @@ public class SnowboarderTricks : MonoBehaviour
             Vector3 slopeUp = controller.GroundNormal;
             Vector3 currentForward = targetRot * Vector3.forward;
 
-            // flatten forward onto slope plane so you end up lying "horizontally" on the slope
             Vector3 flatForward = Vector3.ProjectOnPlane(currentForward, slopeUp);
             if (flatForward.sqrMagnitude < 0.0001f)
             {
-                // fallback: use right axis if forward is nearly vertical
                 flatForward = Vector3.ProjectOnPlane(targetRot * Vector3.right, slopeUp);
             }
 

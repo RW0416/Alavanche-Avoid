@@ -57,12 +57,12 @@ public class PlayerLifeSystem : MonoBehaviour
         if (gameOverUI == null)
             gameOverUI = FindFirstObjectByType<GameOverUI>();
 
-        // ¡ï ÕâÀï½Ó GameProgress ¡ï
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ GameProgress ï¿½ï¿½
         int startExtra = baseExtraLives;
 
         if (GameProgress.Instance != null)
         {
-            // ¼ÙÉè 1 ¸öµÈ¼¶ = ¶à 1 ÌõÃü
+            // ï¿½ï¿½ï¿½ï¿½ 1 ï¿½ï¿½ï¿½È¼ï¿½ = ï¿½ï¿½ 1 ï¿½ï¿½ï¿½ï¿½
             startExtra += GameProgress.Instance.extraLifeLevel;
         }
 
@@ -210,11 +210,11 @@ public class PlayerLifeSystem : MonoBehaviour
         if (extraLives <= 0)
             return;
 
-        // ÏÈ¿Ûµô±¾¾ÖµÄÃü
+        // ï¿½È¿Ûµï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½
         extraLives--;
         Debug.Log($"[PlayerLifeSystem] UseExtraLife -> remaining in this run = {extraLives}");
 
-        // ¡ï Í¬²½¿Ûµô´æµµÀïµÄ ExtraLife µÈ¼¶£¨°ÑËüµ±³É¡°´æ»õ¡±£©
+        // ï¿½ï¿½ Í¬ï¿½ï¿½ï¿½Ûµï¿½ï¿½æµµï¿½ï¿½ï¿½ ExtraLife ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         if (GameProgress.Instance != null)
         {
             if (GameProgress.Instance.extraLifeLevel > 0)
@@ -225,12 +225,12 @@ public class PlayerLifeSystem : MonoBehaviour
             }
         }
 
-        // ===== Ê£ÏÂµÄÂß¼­±£³ÖÔ­Ñù =====
+        // ===== Ê£ï¿½Âµï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½ =====
 
-        // »Ö¸´Ê±¼ä
+        // ï¿½Ö¸ï¿½Ê±ï¿½ï¿½
         Time.timeScale = (savedTimeScale <= 0f) ? 1f : savedTimeScale;
 
-        // Ëø»ØÊó±ê
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -257,5 +257,22 @@ public class PlayerLifeSystem : MonoBehaviour
 
         isGameOver = false;
     }
+        /// <summary>
+    /// Called when a trick landing is too scuffed to survive.
+    /// Always behaves like a final death and does NOT consume extra life.
+    /// </summary>
+    public void KillFromTrickCrash()
+    {
+        if (isGameOver)
+            return;
+
+        // force this to be a "no extra life" death so the panel
+        // doesn't offer Use Extra Life for bad trick landings
+        extraLives = 0;
+
+        Debug.Log("[PlayerLifeSystem] KillFromTrickCrash -> forcing final death.");
+        HandleFinalDeath();
+    }
+
 
 }
