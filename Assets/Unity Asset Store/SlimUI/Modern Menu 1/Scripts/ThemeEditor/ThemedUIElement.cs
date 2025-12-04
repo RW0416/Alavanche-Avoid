@@ -18,13 +18,30 @@ namespace SlimUI.ModernMenu{
 
 			if(hasImage){
 				image = GetComponent<Image>();
-				image.color = themeController.currentColor;
+				if (image != null && themeController != null){
+					image.color = themeController.currentColor;
+				}
 			}
 
 			message = gameObject;
 
-			if(isText){
-				message.GetComponent<TextMeshPro>().color = themeController.textColor;
+			if(isText && themeController != null){
+				TMP_Text tmp = message.GetComponent<TMP_Text>();
+				if (tmp != null){
+					// 文字颜色
+					tmp.color = themeController.textColor;
+
+					// 阴影
+					Material mat = tmp.fontMaterial;
+					if (themeController.useShadow){
+						mat.EnableKeyword("UNDERLAY_ON");
+						mat.SetColor("_UnderlayColor", themeController.shadowColor);
+						mat.SetFloat("_UnderlayOffsetX", themeController.shadowOffset.x);
+						mat.SetFloat("_UnderlayOffsetY", themeController.shadowOffset.y);
+					} else {
+						mat.DisableKeyword("UNDERLAY_ON");
+					}
+				}
 			}
 		}
 	}

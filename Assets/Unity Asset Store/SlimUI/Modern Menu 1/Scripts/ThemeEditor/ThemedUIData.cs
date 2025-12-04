@@ -34,5 +34,10 @@ namespace SlimUI.ModernMenu{
 		public Color currentColor;
 		[HideInInspector]
 		public Color32 textColor;
+
+		[Header("SHADOW SETTINGS")]
+		public bool useShadow = true;
+		public Color shadowColor = new Color(0f, 0f, 0f, 0.5f);
+		public Vector2 shadowOffset = new Vector2(1f, -1f);
 	}
 }
