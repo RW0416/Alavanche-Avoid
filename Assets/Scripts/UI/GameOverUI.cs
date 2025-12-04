@@ -32,7 +32,7 @@ public class GameOverUI : MonoBehaviour
 
     void Awake()
     {
-        lifeSystem = FindObjectOfType<PlayerLifeSystem>();
+        lifeSystem = FindFirstObjectByType<PlayerLifeSystem>();
 
         if (canvasGroup == null && panelRoot != null)
             canvasGroup = panelRoot.GetComponent<CanvasGroup>();
@@ -140,6 +140,13 @@ public class GameOverUI : MonoBehaviour
     public void OnRestartToGaragePressed()
     {
         Debug.Log("[GameOverUI] Restart/BackToGarage button pressed.");
+
+        ScoreManager sm = ScoreManager.Instance;
+        if (sm != null)
+        {
+            GameProgress.Instance.TrySetHighScore(sm.CurrentScore);
+        }
+
         Time.timeScale = 1f;   // 重新加载前把时间恢复正常
         SceneManager.LoadScene("Garage Scene");
     }

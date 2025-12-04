@@ -103,6 +103,12 @@ public class PlayerLifeSystem : MonoBehaviour
     {
         isGameOver = true;
 
+        ScoreManager sm = ScoreManager.Instance;
+        if (sm != null)
+        {
+            GameProgress.Instance.TrySetHighScore(sm.CurrentScore);
+        }
+
         // freeze game time
         savedTimeScale = Time.timeScale;
         Time.timeScale = 0f;
@@ -144,6 +150,12 @@ public class PlayerLifeSystem : MonoBehaviour
     void HandleFinalDeath()
     {
         isGameOver = true;
+
+        ScoreManager sm = ScoreManager.Instance;
+        if (sm != null)
+        {
+            GameProgress.Instance.TrySetHighScore(sm.CurrentScore);
+        }
 
         if (controller != null)
             controller.enabled = false;
@@ -197,6 +209,7 @@ public class PlayerLifeSystem : MonoBehaviour
                 body.AddForce(impulse * extraBodyImpulseMultiplier, ForceMode.VelocityChange);
             }
         }
+
 
         if (gameOverUI != null)
             gameOverUI.ShowGameOver(false, extraLives);
@@ -257,7 +270,7 @@ public class PlayerLifeSystem : MonoBehaviour
 
         isGameOver = false;
     }
-        /// <summary>
+    /// <summary>
     /// Called when a trick landing is too scuffed to survive.
     /// Always behaves like a final death and does NOT consume extra life.
     /// </summary>

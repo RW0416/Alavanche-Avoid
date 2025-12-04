@@ -12,6 +12,8 @@ public class ScoreManager : MonoBehaviour
     public GameObject floatingTextPrefab;   // prefab with FloatingText + TMP_Text
 
     int score = 0;
+    public int CurrentScore => score;
+
 
     void Awake()
     {

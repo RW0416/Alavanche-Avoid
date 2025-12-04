@@ -8,18 +8,20 @@ public class GameProgress : MonoBehaviour
     public int coins = 0;
 
     [Header("Upgrade Levels")]
-    public int speedLevel = 0;       // 影响移动速度
-    public int trickSpeedLevel = 0;  // 影响flip/SPIN速度
-    public int extraLifeLevel = 0;   // 额外生命（之后接到死亡逻辑）
+    public int speedLevel = 0; 
+    public int trickSpeedLevel = 0;  
+    public int extraLifeLevel = 0;  
 
     [Header("Upgrade Effect Per Level")]
-    [Tooltip("每一级速度加成，0.1 = +10%")]
+    [Tooltip("speed = +10%")]
     public float speedPerLevel = 0.1f;
 
-    [Tooltip("每一级trick速度加成，0.1 = +10%")]
+    [Tooltip("trickSpeed = +10%")]
     public float trickSpeedPerLevel = 0.1f;
 
-    // ======== 事件：金币变化时通知 UI ========
+    [Header("Score")]
+    public int highestScore = 0;
+
     public System.Action<int> OnCoinsChanged;
 
     void Awake()
@@ -36,13 +38,11 @@ public class GameProgress : MonoBehaviour
         Load();
     }
 
-    // 小工具：触发事件
     void NotifyCoinsChanged()
     {
         OnCoinsChanged?.Invoke(coins);
     }
 
-    // ======== 金币 ========
     public void AddCoins(int amount)
     {
         if (amount <= 0) return;
@@ -63,7 +63,6 @@ public class GameProgress : MonoBehaviour
         return true;
     }
 
-    // ======== 升级倍率 ========
     public float GetSpeedMultiplier()
     {
         return 1f + speedLevel * speedPerLevel;
@@ -74,11 +73,38 @@ public class GameProgress : MonoBehaviour
         return 1f + trickSpeedLevel * trickSpeedPerLevel;
     }
 
-    // ======== 存档 / 读档 ========
     const string CoinsKey = "gp_coins";
     const string SpeedKey = "gp_speedLevel";
     const string TrickKey = "gp_trickSpeedLevel";
     const string ExtraLifeKey = "gp_extraLifeLevel";
+    const string HighScoreKey = "gp_highScore";
+
+
+    public static void WipeAllProgress()
+    {
+        PlayerPrefs.DeleteKey(CoinsKey);
+        PlayerPrefs.DeleteKey(SpeedKey);
+        PlayerPrefs.DeleteKey(TrickKey);
+        PlayerPrefs.DeleteKey(ExtraLifeKey);
+        PlayerPrefs.DeleteKey(HighScoreKey);
+        PlayerPrefs.Save();
+
+        if (Instance != null)
+        {
+            Instance.coins = 0;
+            Instance.speedLevel = 0;
+            Instance.trickSpeedLevel = 0;
+            Instance.extraLifeLevel = 0;
+            Instance.highestScore = 0;
+        }
+    }
+    public static bool HasAnySave()
+    {
+        return PlayerPrefs.HasKey(CoinsKey) ||
+               PlayerPrefs.HasKey(SpeedKey) ||
+               PlayerPrefs.HasKey(TrickKey) ||
+               PlayerPrefs.HasKey(ExtraLifeKey);
+    }
 
     public void Save()
     {
@@ -86,8 +112,10 @@ public class GameProgress : MonoBehaviour
         PlayerPrefs.SetInt(SpeedKey, speedLevel);
         PlayerPrefs.SetInt(TrickKey, trickSpeedLevel);
         PlayerPrefs.SetInt(ExtraLifeKey, extraLifeLevel);
+        PlayerPrefs.SetInt(HighScoreKey, highestScore);
         PlayerPrefs.Save();
     }
+
 
     void Load()
     {
@@ -95,5 +123,18 @@ public class GameProgress : MonoBehaviour
         speedLevel = PlayerPrefs.GetInt(SpeedKey, 0);
         trickSpeedLevel = PlayerPrefs.GetInt(TrickKey, 0);
         extraLifeLevel = PlayerPrefs.GetInt(ExtraLifeKey, 0);
+        highestScore = PlayerPrefs.GetInt(HighScoreKey, 0);
     }
+
+    public void TrySetHighScore(int newScore)
+    {
+        if (newScore > highestScore)
+        {
+            highestScore = newScore;
+            Save();
+            Debug.Log($"[GameProgress] New Highest Score = {highestScore}");
+        }
+    }
+
+
 }
