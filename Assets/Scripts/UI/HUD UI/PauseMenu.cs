@@ -66,18 +66,21 @@ public class PauseMenu : MonoBehaviour
         SceneManager.LoadScene("Garage");
     }
 
-    public void ExitGame()
-    {
-        Debug.Log("QUIT GAME!");
-        Application.Quit();
-    }
-
     public void OpenPauseMenu()
 {
     if (!isPaused)
     {
         PauseGame();
     }
+}
+
+public void GoToStartScene()
+{
+    // 确保时间恢复正常
+    Time.timeScale = 1f;
+
+    // 加载 Start 菜单场景
+    SceneManager.LoadScene("Start Scene");
 }
 
 }
