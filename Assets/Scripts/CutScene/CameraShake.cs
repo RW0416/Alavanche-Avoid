@@ -13,6 +13,9 @@ public class CameraShake : MonoBehaviour
     public bool autoShakeOnEnable = false;
     public float autoShakeDelay = 0f;
 
+    [Header("Audio")]
+    public AudioSource shakeSound;
+
     CutsceneCameraFollow follow;
     Vector3 baseOffset = Vector3.zero;
     Coroutine shakeRoutine;
@@ -41,6 +44,8 @@ public class CameraShake : MonoBehaviour
             follow.positionOffset = baseOffset;
         else
             transform.localPosition = Vector3.zero;
+
+        if (shakeSound != null) shakeSound.Stop();
     }
 
     public void Shake()
@@ -59,6 +64,12 @@ public class CameraShake : MonoBehaviour
         if (delay > 0f)
             yield return new WaitForSeconds(delay);
 
+        if (shakeSound != null)
+        {
+            shakeSound.loop = true; 
+            shakeSound.Play();
+        }
+
         float elapsed = 0f;
 
         while (elapsed < duration)
@@ -66,6 +77,7 @@ public class CameraShake : MonoBehaviour
             elapsed += Time.deltaTime;
 
             float damper = 1f - Mathf.Clamp01(elapsed / duration);
+            if (shakeSound != null) shakeSound.volume = damper;
 
             float x = (Mathf.PerlinNoise(0f, Time.time * frequency) - 0.5f) * 2f;
             float y = (Mathf.PerlinNoise(1f, Time.time * frequency) - 0.5f) * 2f;
@@ -84,6 +96,8 @@ public class CameraShake : MonoBehaviour
             follow.positionOffset = baseOffset;
         else
             transform.localPosition = Vector3.zero;
+
+        if (shakeSound != null) shakeSound.Stop();
 
         shakeRoutine = null;
     }
