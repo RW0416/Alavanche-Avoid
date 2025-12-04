@@ -85,6 +85,7 @@
     <Compile Include="Assets\Scripts\UI\SurvivalTimerUI.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_SnowSubShowcase.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Avalanche_Gen.cs" />
+    <Compile Include="Assets\Unity Asset Store\SlimUI\Modern Menu 1\Scripts\Managers\MouseSettingsUI.cs" />
     <Compile Include="Assets\BruteForce\Scripts\BF_PlayerSnow.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\Line_effect.cs" />
     <Compile Include="Assets\Scripts\Avalanche_Gen\KeepRagdollVisible.cs" />
