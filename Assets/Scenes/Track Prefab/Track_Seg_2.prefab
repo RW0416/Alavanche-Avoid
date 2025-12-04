@@ -84,6 +84,59 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 40, y: 1, z: 80}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1297570349158732325
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7614358245727134954}
+  - component: {fileID: 4618433895916991925}
+  m_Layer: 0
+  m_Name: Coins (2)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7614358245727134954
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297570349158732325}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: 0.055967383, z: -0, w: 0.99843264}
+  m_LocalPosition: {x: 28.1, y: 16.5, z: 83.6}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3834419299405379612}
+  m_LocalEulerAnglesHint: {x: 0, y: 6.417, z: 0}
+--- !u!65 &4618433895916991925
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1297570349158732325}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 46.68, y: 1, z: -149.5}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1417030622213124247
 GameObject:
   m_ObjectHideFlags: 0
@@ -4920,6 +4973,59 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!1 &1512611130696476608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2312130215527854879}
+  - component: {fileID: 3496374583066228447}
+  m_Layer: 0
+  m_Name: Coins
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2312130215527854879
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1512611130696476608}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.1249783, z: -0, w: 0.9921595}
+  m_LocalPosition: {x: 11.2, y: 16.5, z: 218.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3834419299405379612}
+  m_LocalEulerAnglesHint: {x: 0, y: -14.359, z: 0}
+--- !u!65 &3496374583066228447
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1512611130696476608}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 46.68, y: 1, z: -149.5}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1555409669976421317
 GameObject:
   m_ObjectHideFlags: 0
@@ -5056,6 +5162,59 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 40, y: 1, z: 40}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &3704320630056274501
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 346622860823529199}
+  - component: {fileID: 4210139824067078967}
+  m_Layer: 0
+  m_Name: Coins (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &346622860823529199
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3704320630056274501}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.106992595, z: -0, w: 0.99425983}
+  m_LocalPosition: {x: -26.9, y: 16.5, z: -203.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3834419299405379612}
+  m_LocalEulerAnglesHint: {x: 0, y: -12.284, z: 0}
+--- !u!65 &4210139824067078967
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3704320630056274501}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 46.68, y: 1, z: -149.5}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4978532023048892849
 GameObject:
@@ -43845,6 +44004,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3834419299405379612}
   - component: {fileID: 1150598542199995724}
+  - component: {fileID: 6384284007680470518}
   m_Layer: 0
   m_Name: Track_Seg_2
   m_TagString: Untagged
@@ -43865,6 +44025,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2312130215527854879}
+  - {fileID: 346622860823529199}
+  - {fileID: 7614358245727134954}
   - {fileID: 8721713937058712186}
   - {fileID: 1932543936833632358}
   - {fileID: 3559799854646846425}
@@ -43908,6 +44071,32 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   spawnOffset: {x: 0, y: 0.1, z: 0}
+--- !u!114 &6384284007680470518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7430620446333683853}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ca276624844872419f5ef197d4d9cca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CoinSpawner
+  coinPrefab: {fileID: 3385094661174615493, guid: 6c41437af77aeab469f5b102a4b31427, type: 3}
+  spawnProbability: 0.5
+  minDistance: 4
+  gridSpacing: 5
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  spawnOffset: {x: 0, y: 3, z: 0}
+  coinsPerRow: 4
+  distanceBetweenCoins: 6
+  minCurveAmplitude: 1
+  maxCurveAmplitude: 6
+  coinRotationOffsetEuler: {x: 90, y: 0, z: 0}
+  areaPrefix: Coins
 --- !u!1 &8522792130087384272
 GameObject:
   m_ObjectHideFlags: 0
