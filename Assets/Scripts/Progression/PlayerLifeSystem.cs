@@ -279,12 +279,18 @@ public class PlayerLifeSystem : MonoBehaviour
         if (isGameOver)
             return;
 
-        // force this to be a "no extra life" death so the panel
-        // doesn't offer Use Extra Life for bad trick landings
-        extraLives = 0;
+        Debug.Log($"[PlayerLifeSystem] KillFromTrickCrash, extraLives = {extraLives}");
 
-        Debug.Log("[PlayerLifeSystem] KillFromTrickCrash -> forcing final death.");
-        HandleFinalDeath();
+        if (extraLives > 0)
+        {
+            // Scenario A: behave like an "extra life" death (no ragdoll, freeze, UI)
+            HandleExtraLifeDeath();
+        }
+        else
+        {
+            // Scenario B: behave like a final death (ragdoll, normal game over)
+            HandleFinalDeath();
+        }
     }
 
 
