@@ -78,6 +78,8 @@ public class GameProgress : MonoBehaviour
     const string TrickKey = "gp_trickSpeedLevel";
     const string ExtraLifeKey = "gp_extraLifeLevel";
     const string HighScoreKey = "gp_highScore";
+    const string IntroWatchedKey = "IntroCutsceneWatched"; 
+
 
 
     public static void WipeAllProgress()
@@ -87,6 +89,7 @@ public class GameProgress : MonoBehaviour
         PlayerPrefs.DeleteKey(TrickKey);
         PlayerPrefs.DeleteKey(ExtraLifeKey);
         PlayerPrefs.DeleteKey(HighScoreKey);
+        PlayerPrefs.DeleteKey(IntroWatchedKey);
         PlayerPrefs.Save();
 
         if (Instance != null)

@@ -32,5 +32,5 @@ MonoBehaviour:
     serializedVersion: 2
     rgba: 4294967295
   useShadow: 1
-  shadowColor: {r: 0.800539, g: 0.07144171, b: 0.050707962, a: 0.5}
+  shadowColor: {r: 0, g: 0, b: 0, a: 0.5}
   shadowOffset: {x: 600, y: -500}

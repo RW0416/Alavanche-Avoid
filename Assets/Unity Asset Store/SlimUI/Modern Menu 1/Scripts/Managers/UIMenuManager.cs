@@ -98,14 +98,19 @@ namespace SlimUI.ModernMenu
 
             SetThemeColors();
         }
-        public void NewGame()
-        {
-            // 1. 清空所有 GameProgress 存档
-            GameProgress.WipeAllProgress();
+		public void NewGame()
+		{
+			// reset cutscene skip flag, so you must rewatch
+			PlayerPrefs.DeleteKey("IntroCutsceneWatched");
+			PlayerPrefs.Save();
 
-            // 2. 进入起始场景（比如 Garage Scene）
-            LoadScene(garageSceneName);
-        }
+			// clear all gameplay progress
+			GameProgress.WipeAllProgress();
+
+			// go to starting scene (garage / intro)
+			LoadScene(garageSceneName);
+		}
+
 
         // Load Game 按钮调用
         public void LoadGame()

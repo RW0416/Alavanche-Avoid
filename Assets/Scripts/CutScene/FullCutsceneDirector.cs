@@ -17,6 +17,7 @@ public class FullCutsceneDirector : MonoBehaviour
     public CameraShake secondCameraShake;
     public string runStateName = "Idle Walk Run Blend"; // name of the locomotion state
 
+
     [Header("fade")]
     public CanvasGroup fadeCanvas;
     public float fadeDuration = 1f;
@@ -160,6 +161,7 @@ public class FullCutsceneDirector : MonoBehaviour
 
         // also respect custom speed param if you changed the name
         SetSecondNpcSpeed(1f);
+
     }
 
     void SetSecondNpcSpeed(float value)
