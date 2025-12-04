@@ -284,7 +284,11 @@ namespace SlimUI.ModernMenu
         {
             swooshSound.Play();
         }
-
+        void LockCursorForGameplay()
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
         // Are You Sure - Quit Panel Pop Up
         public void AreYouSure()
         {
@@ -319,7 +323,7 @@ namespace SlimUI.ModernMenu
 
         // Load Bar synching animation
         IEnumerator LoadAsynchronously(string sceneName)
-        { // scene name is just the name of the current scene being loaded
+        { 
             AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
             operation.allowSceneActivation = false;
             mainCanvas.SetActive(false);
@@ -337,16 +341,21 @@ namespace SlimUI.ModernMenu
 
                     if (Input.GetKeyDown(userPromptKey))
                     {
+                        // lock mouse before we actually switch to the game scene
+                        LockCursorForGameplay();
                         operation.allowSceneActivation = true;
                     }
                 }
                 else if (operation.progress >= 0.9f && !waitForInput)
                 {
+                    // auto-continue: lock mouse then activate scene
+                    LockCursorForGameplay();
                     operation.allowSceneActivation = true;
                 }
 
                 yield return null;
             }
         }
+
     }
 }

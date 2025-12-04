@@ -66,7 +66,7 @@ namespace SlimUI.ModernMenu
                 difficultynormaltextLINE.gameObject.SetActive(false);
             }
 
-            float savedMusic = PlayerPrefs.GetFloat("MusicVolume", 0.75f);
+            float savedMusic = PlayerPrefs.GetFloat("MusicVolume", 0.3f);
             if (musicSlider != null) musicSlider.GetComponent<Slider>().value = savedMusic;
             if (mainAudioMixer != null)
             {
@@ -74,7 +74,7 @@ namespace SlimUI.ModernMenu
                 mainAudioMixer.SetFloat("MusicVol", musicDb);
             }
 
-            float savedSFX = PlayerPrefs.GetFloat("SFXVolume", 0.75f);
+            float savedSFX = PlayerPrefs.GetFloat("SFXVolume", 0.3f);
             if (sfxSlider != null) sfxSlider.GetComponent<Slider>().value = savedSFX;
             if (mainAudioMixer != null)
             {
