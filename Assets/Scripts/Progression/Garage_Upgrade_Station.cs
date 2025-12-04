@@ -143,18 +143,42 @@ public class GarageUpgradeStation : MonoBehaviour
             _ => "Upgrade"
         };
 
+        // ---- 文本根据类型区分 ----
+        bool isExtraLife = (upgradeType == UpgradeType.ExtraLife);
+
         if (maxLevel > 0 && level >= maxLevel)
         {
-            worldText.textContent =
-                $"{label}\n" +
-                $"Max Level Reached (Lv.{level})";
+            // 达到上限
+            if (isExtraLife)
+            {
+                worldText.textContent =
+                    $"{label}\n" +
+                    $"Max Owned: {level}";
+            }
+            else
+            {
+                worldText.textContent =
+                    $"{label}\n" +
+                    $"Max Level Reached (Lv.{level})";
+            }
         }
         else
         {
-            worldText.textContent =
-                $"Press E to {label}\n" +
-                $"Cost: {cost} Coins (You: {coins})\n" +
-                $"Current Level: {level}";
+            // 还可以继续购买 / 升级
+            if (isExtraLife)
+            {
+                worldText.textContent =
+                    $"Press E to {label}\n" +
+                    $"Cost: {cost} Coins (You: {coins})\n" +
+                    $"Current Owned: {level}";
+            }
+            else
+            {
+                worldText.textContent =
+                    $"Press E to {label}\n" +
+                    $"Cost: {cost} Coins (You: {coins})\n" +
+                    $"Current Level: {level}";
+            }
         }
     }
 }
